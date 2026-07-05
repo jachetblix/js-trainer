@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Trainer — путь в DevOps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --base:#1e1e2e; --mantle:#181825; --crust:#11111b;
+  --surface0:#313244; --surface1:#45475a;
+  --text:#cdd6f4; --subtext:#a6adc8; --overlay:#6c7086;
+  --mauve:#cba6f7; --green:#a6e3a1; --red:#f38ba8; --yellow:#f9e2af;
+  --blue:#89b4fa; --peach:#fab387; --teal:#94e2d5;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--crust);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6}
+::selection{background:var(--mauve);color:var(--crust)}
+
+.app{display:flex;min-height:100vh}
+
+/* ---------- sidebar ---------- */
+.sidebar{width:270px;flex-shrink:0;background:var(--mantle);border-right:1px solid var(--surface0);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo{font-family:var(--mono);font-weight:700;font-size:15px;padding:0 20px 6px;color:var(--mauve)}
+.logo span{color:var(--overlay)}
+.tagline{font-family:var(--mono);font-size:11px;color:var(--overlay);padding:0 20px 16px;border-bottom:1px solid var(--surface0)}
+.progress-wrap{padding:14px 20px;border-bottom:1px solid var(--surface0)}
+.progress-label{font-family:var(--mono);font-size:11px;color:var(--subtext);display:flex;justify-content:space-between;margin-bottom:6px}
+.progress-bar{height:6px;background:var(--surface0);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--mauve),var(--green));border-radius:3px;transition:width .4s}
+.nav{padding:10px 8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;cursor:pointer;font-family:var(--mono);font-size:12.5px;color:var(--subtext);transition:background .15s,color .15s}
+.nav-item:hover{background:var(--surface0);color:var(--text)}
+.nav-item.active{background:var(--surface0);color:var(--mauve)}
+.nav-num{color:var(--overlay);font-size:11px;width:20px}
+.nav-item.active .nav-num{color:var(--mauve)}
+.nav-check{margin-left:auto;font-size:11px;color:var(--overlay)}
+.nav-check.done{color:var(--green)}
+.nav-check.part{color:var(--yellow)}
+
+/* ---------- main ---------- */
+.main{flex:1;max-width:880px;padding:36px 44px 100px}
+.module-eyebrow{font-family:var(--mono);font-size:12px;color:var(--overlay);margin-bottom:6px}
+.module-eyebrow b{color:var(--green);font-weight:500}
+h1{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--text);margin-bottom:8px}
+.module-desc{color:var(--subtext);margin-bottom:10px;max-width:640px}
+.ext-link{font-family:var(--mono);font-size:12px;color:var(--blue);text-decoration:none;border-bottom:1px dashed var(--surface1)}
+.ext-link:hover{color:var(--teal)}
+
+.theory{background:var(--base);border:1px solid var(--surface0);border-radius:12px;padding:22px 26px;margin:26px 0}
+.theory h3{font-family:var(--mono);font-size:13px;color:var(--peach);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.theory p{color:var(--text);margin-bottom:10px}
+.theory ul{margin:0 0 10px 20px;color:var(--text)}
+.theory li{margin-bottom:5px}
+.theory code{font-family:var(--mono);font-size:13px;background:var(--surface0);color:var(--teal);padding:1px 6px;border-radius:4px}
+.theory pre{background:var(--crust);border:1px solid var(--surface0);border-radius:8px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+.theory pre code{background:none;padding:0;color:var(--text);font-size:13px;line-height:1.55}
+.c-kw{color:var(--mauve)} .c-str{color:var(--green)} .c-num{color:var(--peach)} .c-com{color:var(--overlay);font-style:italic} .c-fn{color:var(--blue)}
+
+/* ---------- task ---------- */
+.task{background:var(--base);border:1px solid var(--surface0);border-radius:12px;margin:22px 0;overflow:hidden}
+.task-head{display:flex;align-items:center;gap:10px;padding:15px 22px;border-bottom:1px solid var(--surface0);background:var(--mantle)}
+.task-status{width:10px;height:10px;border-radius:50%;background:var(--surface1);flex-shrink:0}
+.task-status.pass{background:var(--green);box-shadow:0 0 8px rgba(166,227,161,.5)}
+.task-status.fail{background:var(--red)}
+.task-title{font-family:var(--mono);font-size:14px;font-weight:500}
+.task-tag{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--overlay);background:var(--surface0);padding:2px 9px;border-radius:20px}
+.task-body{padding:20px 22px}
+.task-desc{color:var(--text);margin-bottom:6px}
+.task-desc code{font-family:var(--mono);font-size:13px;background:var(--surface0);color:var(--teal);padding:1px 6px;border-radius:4px}
+.task-desc .io{font-family:var(--mono);font-size:12.5px;color:var(--subtext);display:block;margin-top:8px;background:var(--crust);border-radius:6px;padding:10px 14px;border:1px solid var(--surface0);white-space:pre-wrap}
+
+.editor{width:100%;min-height:150px;background:var(--crust);color:var(--text);border:1px solid var(--surface0);border-radius:8px;font-family:var(--mono);font-size:13.5px;line-height:1.6;padding:14px 16px;resize:vertical;margin-top:14px;tab-size:2}
+.editor:focus{outline:none;border-color:var(--mauve)}
+
+.task-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+button{font-family:var(--mono);font-size:12.5px;font-weight:500;border:none;border-radius:7px;padding:8px 18px;cursor:pointer;transition:transform .1s,opacity .15s}
+button:hover{opacity:.88}
+button:active{transform:scale(.97)}
+.btn-run{background:var(--green);color:var(--crust)}
+.btn-ghost{background:var(--surface0);color:var(--subtext)}
+.btn-ghost:hover{color:var(--text)}
+
+.output{margin-top:14px;background:var(--crust);border:1px solid var(--surface0);border-radius:8px;padding:12px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;display:none;white-space:pre-wrap;word-break:break-word}
+.output.show{display:block}
+.t-pass{color:var(--green)} .t-fail{color:var(--red)} .t-log{color:var(--overlay)} .t-err{color:var(--red)} .t-sum{color:var(--yellow)}
+
+.hintbox{margin-top:12px;background:var(--crust);border:1px solid var(--surface0);border-left:3px solid var(--yellow);border-radius:8px;padding:12px 16px;font-size:14px;color:var(--subtext);display:none}
+.hintbox.show{display:block}
+.solbox{margin-top:12px;display:none}
+.solbox.show{display:block}
+.solbox pre{background:var(--crust);border:1px solid var(--surface0);border-left:3px solid var(--blue);border-radius:8px;padding:14px 16px;overflow-x:auto}
+.solbox pre code{font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.55}
+
+.module-nav{display:flex;justify-content:space-between;margin-top:40px}
+.module-nav button{padding:10px 22px}
+
+.finish{background:var(--base);border:1px solid var(--green);border-radius:12px;padding:26px;text-align:center;margin-top:30px;display:none}
+.finish.show{display:block}
+.finish h2{font-family:var(--mono);color:var(--green);font-size:18px;margin-bottom:8px}
+.finish p{color:var(--subtext)}
+
+@media(max-width:800px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:static}
+  .main{padding:24px 18px 80px}
+  .nav{display:flex;flex-wrap:wrap;gap:4px}
+  .nav-item{padding:6px 10px}
+  .nav-check{margin-left:4px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">js-trainer <span>v1.0</span></div>
+    <div class="tagline">$ node --path=devops</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>прогресс</span><span id="prog-text">0/30</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+/* =========================================================
+   ДАННЫЕ КУРСА
+   ========================================================= */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+const MODULES = [
+/* ---------- 01 ---------- */
+{
+  id:'m1', title:'Переменные и типы',
+  desc:'Фундамент: как объявлять переменные, какие типы есть в JS и где спрятаны грабли.',
+  links:[['Переменные','https://javascript.info/variables'],['Типы данных','https://javascript.info/types'],['Преобразования','https://javascript.info/type-conversions']],
+  theory:`<h3>// теория</h3>
+<p>В современном JS переменные объявляют через <code>let</code> (изменяемая) и <code>const</code> (константа). <code>var</code> — легаси, в новом коде не используем (но в старом Angular встретишь).</p>
+<pre><code><span class="c-kw">const</span> serverName = <span class="c-str">'web-01'</span>;  <span class="c-com">// нельзя переприсвоить</span>
+<span class="c-kw">let</span> retries = <span class="c-num">0</span>;               <span class="c-com">// можно менять</span>
+retries = retries + <span class="c-num">1</span>;</code></pre>
+<p>Восемь типов, но на практике важны: <code>number</code>, <code>string</code>, <code>boolean</code>, <code>null</code>, <code>undefined</code>, <code>object</code>. Оператор <code>typeof</code> возвращает тип строкой.</p>
+<ul>
+<li><code>typeof null === 'object'</code> — историческая ошибка языка, запомни её, любят спрашивать</li>
+<li><code>undefined</code> — «значение не присвоено», <code>null</code> — «значения нет намеренно»</li>
+<li><code>Number('42') → 42</code>, но <code>Number('abc') → NaN</code>. Проверка: <code>Number.isNaN(x)</code></li>
+<li><code>Number('') → 0</code> — пустая строка превращается в ноль, ещё одни грабли</li>
+</ul>`,
+  tasks:[
+  {
+    id:'m1t1', title:'describe()', tag:'typeof',
+    desc:`Напиши функцию <code>describe(value)</code>, которая возвращает тип значения строкой (результат <code>typeof</code>).<span class="io">describe(42)        → 'number'
+describe('hello')   → 'string'
+describe(null)      → 'object'   // да, вот эти грабли
+describe(undefined) → 'undefined'</span>`,
+    starter:"function describe(value) {\n  // твой код\n}",
+    fname:'describe',
+    tests:[
+      {args:[42],exp:'number'},{args:['hello'],exp:'string'},
+      {args:[true],exp:'boolean'},{args:[null],exp:'object'},
+      {args:[undefined],exp:'undefined'},{args:[{}],exp:'object'}
+    ],
+    hint:'Просто верни результат оператора typeof. Он всегда возвращает строку.',
+    solution:"function describe(value) {\n  return typeof value;\n}"
+  },
+  {
+    id:'m1t2', title:'toNumber()', tag:'преобразования',
+    desc:`Функция <code>toNumber(str)</code> преобразует строку в число. Если получилось <code>NaN</code> — верни <code>null</code>.<span class="io">toNumber('42')   → 42
+toNumber('3.14') → 3.14
+toNumber('abc')  → null
+toNumber('')     → 0     // пустая строка — это 0!</span>`,
+    starter:"function toNumber(str) {\n  // Number(...) и проверка на NaN\n}",
+    fname:'toNumber',
+    tests:[
+      {args:['42'],exp:42},{args:['3.14'],exp:3.14},
+      {args:['abc'],exp:null},{args:[''],exp:0},{args:['-7'],exp:-7}
+    ],
+    hint:'Number(str) делает преобразование. Number.isNaN(n) проверяет результат. Обычный n === NaN не сработает — NaN не равен даже самому себе.',
+    solution:"function toNumber(str) {\n  const n = Number(str);\n  return Number.isNaN(n) ? null : n;\n}"
+  },
+  {
+    id:'m1t3', title:'isTruthy()', tag:'boolean',
+    desc:`Функция <code>isTruthy(v)</code> возвращает <code>true</code>, если значение «правдиво» при преобразовании к boolean. Falsy-значений всего шесть: <code>0</code>, <code>''</code>, <code>null</code>, <code>undefined</code>, <code>NaN</code>, <code>false</code>. Всё остальное — truthy.<span class="io">isTruthy(0)       → false
+isTruthy('false') → true   // непустая строка!
+isTruthy([])      → true   // пустой массив — объект</span>`,
+    starter:"function isTruthy(v) {\n  // одна строка\n}",
+    fname:'isTruthy',
+    tests:[
+      {args:[0],exp:false},{args:[''],exp:false},{args:[null],exp:false},
+      {args:['false'],exp:true},{args:[[]],exp:true},{args:[42],exp:true}
+    ],
+    hint:'Boolean(v) или двойное отрицание !!v.',
+    solution:"function isTruthy(v) {\n  return Boolean(v);\n}"
+  }]
+},
+/* ---------- 02 ---------- */
+{
+  id:'m2', title:'Условия и логика',
+  desc:'if/else, тернарник, || vs ?? — то, что в коде встречается каждые пять строк.',
+  links:[['Условия','https://javascript.info/ifelse'],['Логические операторы','https://javascript.info/logical-operators'],['Оператор ??','https://javascript.info/nullish-coalescing-operator']],
+  theory:`<h3>// теория</h3>
+<p>Кроме привычного <code>if/else</code> в JS активно используют короткие формы:</p>
+<pre><code><span class="c-com">// тернарный оператор</span>
+<span class="c-kw">const</span> status = code === <span class="c-num">200</span> ? <span class="c-str">'ok'</span> : <span class="c-str">'error'</span>;
+
+<span class="c-com">// || возвращает первое truthy-значение</span>
+<span class="c-kw">const</span> port = config.port || <span class="c-num">8080</span>;   <span class="c-com">// но port=0 тоже заменится!</span>
+
+<span class="c-com">// ?? срабатывает ТОЛЬКО на null/undefined</span>
+<span class="c-kw">const</span> port2 = config.port ?? <span class="c-num">8080</span>;  <span class="c-com">// port=0 сохранится</span></code></pre>
+<p>Разница между <code>||</code> и <code>??</code> — классический вопрос на собеседовании. <code>||</code> реагирует на любое falsy (включая <code>0</code> и <code>''</code>), а <code>??</code> — только на <code>null</code> и <code>undefined</code>.</p>
+<p>Сравнение: всегда используй строгое <code>===</code> / <code>!==</code>. Нестрогое <code>==</code> делает неявные преобразования (<code>'1' == 1 → true</code>) и приводит к багам.</p>`,
+  tasks:[
+  {
+    id:'m2t1', title:'checkStatus()', tag:'if/else',
+    desc:`Функция <code>checkStatus(code)</code> классифицирует HTTP-код:<span class="io">200–299 → 'ok'
+300–399 → 'redirect'
+400–499 → 'client error'
+500–599 → 'server error'
+иначе   → 'unknown'</span>`,
+    starter:"function checkStatus(code) {\n  // if / else if / else\n}",
+    fname:'checkStatus',
+    tests:[
+      {args:[200],exp:'ok'},{args:[201],exp:'ok'},{args:[301],exp:'redirect'},
+      {args:[404],exp:'client error'},{args:[503],exp:'server error'},{args:[999],exp:'unknown'}
+    ],
+    hint:'Проверяй диапазоны: if (code >= 200 && code < 300) ...',
+    solution:"function checkStatus(code) {\n  if (code >= 200 && code < 300) return 'ok';\n  if (code >= 300 && code < 400) return 'redirect';\n  if (code >= 400 && code < 500) return 'client error';\n  if (code >= 500 && code < 600) return 'server error';\n  return 'unknown';\n}"
+  },
+  {
+    id:'m2t2', title:'getPort()', tag:'?? vs ||',
+    desc:`Функция <code>getPort(config)</code> возвращает <code>config.port</code>, а если его нет (<code>null</code>/<code>undefined</code>) — дефолт <code>8080</code>. Важно: <code>port: 0</code> — валидное значение и должно вернуться как есть!<span class="io">getPort({port: 3000}) → 3000
+getPort({port: 0})    → 0      // не 8080!
+getPort({})           → 8080
+getPort({port: null}) → 8080</span>`,
+    starter:"function getPort(config) {\n  // одна строка, правильный оператор\n}",
+    fname:'getPort',
+    tests:[
+      {args:[{port:3000}],exp:3000},{args:[{port:0}],exp:0},
+      {args:[{}],exp:8080},{args:[{port:null}],exp:8080}
+    ],
+    hint:'Здесь нужен именно ??, а не ||. С || значение 0 превратилось бы в 8080.',
+    solution:"function getPort(config) {\n  return config.port ?? 8080;\n}"
+  },
+  {
+    id:'m2t3', title:'canDeploy()', tag:'логика',
+    desc:`Функция <code>canDeploy(user)</code> возвращает <code>true</code>, если деплой разрешён: пользователь — <code>admin</code>, ИЛИ он <code>dev</code> И у него <code>approved: true</code>.<span class="io">canDeploy({role:'admin'})                → true
+canDeploy({role:'dev', approved:true})   → true
+canDeploy({role:'dev', approved:false})  → false
+canDeploy({role:'viewer'})               → false</span>`,
+    starter:"function canDeploy(user) {\n  // || и &&\n}",
+    fname:'canDeploy',
+    tests:[
+      {args:[{role:'admin'}],exp:true},
+      {args:[{role:'dev',approved:true}],exp:true},
+      {args:[{role:'dev',approved:false}],exp:false},
+      {args:[{role:'viewer',approved:true}],exp:false}
+    ],
+    hint:"user.role === 'admin' || (user.role === 'dev' && user.approved). Скобки для читаемости — && и так приоритетнее ||.",
+    solution:"function canDeploy(user) {\n  return user.role === 'admin' || (user.role === 'dev' && user.approved === true);\n}"
+  }]
+},
+/* ---------- 03 ---------- */
+{
+  id:'m3', title:'Циклы и функции',
+  desc:'for, while, объявление функций, стрелки и рекурсия.',
+  links:[['Циклы','https://javascript.info/while-for'],['Функции','https://javascript.info/function-basics'],['Стрелочные функции','https://javascript.info/arrow-functions-basics']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-com">// классический цикл</span>
+<span class="c-kw">for</span> (<span class="c-kw">let</span> i = <span class="c-num">0</span>; i &lt; <span class="c-num">5</span>; i++) { ... }
+
+<span class="c-com">// по элементам массива</span>
+<span class="c-kw">for</span> (<span class="c-kw">const</span> item <span class="c-kw">of</span> items) { ... }
+
+<span class="c-com">// три способа объявить функцию</span>
+<span class="c-kw">function</span> <span class="c-fn">sum</span>(a, b) { <span class="c-kw">return</span> a + b; }        <span class="c-com">// Function Declaration</span>
+<span class="c-kw">const</span> sum2 = <span class="c-kw">function</span>(a, b) { <span class="c-kw">return</span> a + b; }; <span class="c-com">// Expression</span>
+<span class="c-kw">const</span> sum3 = (a, b) =&gt; a + b;                   <span class="c-com">// стрелочная</span></code></pre>
+<p>Стрелочные функции — стандарт для колбэков. Если тело — одно выражение, <code>return</code> и фигурные скобки не нужны. Главное отличие от обычных (кроме синтаксиса) — у них нет своего <code>this</code>, это станет важно в модуле про объекты.</p>`,
+  tasks:[
+  {
+    id:'m3t1', title:'sumRange()', tag:'for',
+    desc:`Функция <code>sumRange(a, b)</code> возвращает сумму целых чисел от <code>a</code> до <code>b</code> включительно.<span class="io">sumRange(1, 5)  → 15
+sumRange(3, 3)  → 3</span>`,
+    starter:"function sumRange(a, b) {\n  let sum = 0;\n  // цикл\n  return sum;\n}",
+    fname:'sumRange',
+    tests:[{args:[1,5],exp:15},{args:[3,3],exp:3},{args:[1,100],exp:5050},{args:[0,4],exp:10}],
+    hint:'for (let i = a; i <= b; i++) sum += i;',
+    solution:"function sumRange(a, b) {\n  let sum = 0;\n  for (let i = a; i <= b; i++) sum += i;\n  return sum;\n}"
+  },
+  {
+    id:'m3t2', title:'fizzbuzz()', tag:'классика',
+    desc:`Функция <code>fizzbuzz(n)</code> возвращает <b>массив</b> от 1 до n, где кратные 3 заменены на <code>'Fizz'</code>, кратные 5 — на <code>'Buzz'</code>, кратные 15 — на <code>'FizzBuzz'</code>. Самая известная задача собеседований в истории.<span class="io">fizzbuzz(5) → [1, 2, 'Fizz', 4, 'Buzz']</span>`,
+    starter:"function fizzbuzz(n) {\n  const result = [];\n  // ...\n  return result;\n}",
+    fname:'fizzbuzz',
+    tests:[
+      {args:[5],exp:[1,2,'Fizz',4,'Buzz']},
+      {args:[15],exp:[1,2,'Fizz',4,'Buzz','Fizz',7,8,'Fizz','Buzz',11,'Fizz',13,14,'FizzBuzz']}
+    ],
+    hint:'Проверяй сначала кратность 15 (или 3 И 5), иначе до неё никогда не дойдёт. Остаток от деления: i % 3 === 0.',
+    solution:"function fizzbuzz(n) {\n  const result = [];\n  for (let i = 1; i <= n; i++) {\n    if (i % 15 === 0) result.push('FizzBuzz');\n    else if (i % 3 === 0) result.push('Fizz');\n    else if (i % 5 === 0) result.push('Buzz');\n    else result.push(i);\n  }\n  return result;\n}"
+  },
+  {
+    id:'m3t3', title:'factorial()', tag:'рекурсия',
+    desc:`Функция <code>factorial(n)</code> считает факториал через <b>рекурсию</b> (функция вызывает сама себя). База: <code>factorial(0) === 1</code>.<span class="io">factorial(5) → 120
+factorial(0) → 1</span>`,
+    starter:"function factorial(n) {\n  // база + рекурсивный шаг\n}",
+    fname:'factorial',
+    tests:[{args:[5],exp:120},{args:[0],exp:1},{args:[1],exp:1},{args:[7],exp:5040}],
+    hint:'if (n <= 1) return 1; иначе верни n * factorial(n - 1).',
+    solution:"function factorial(n) {\n  if (n <= 1) return 1;\n  return n * factorial(n - 1);\n}"
+  }]
+},
+/* ---------- 04 ---------- */
+{
+  id:'m4', title:'Объекты',
+  desc:'Главная структура данных JS. Конфиги, JSON, всё вокруг — объекты.',
+  links:[['Объекты','https://javascript.info/object'],['Object.keys/values','https://javascript.info/keys-values-entries'],['Spread','https://javascript.info/rest-parameters-spread']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">const</span> server = {
+  name: <span class="c-str">'web-01'</span>,
+  ip: <span class="c-str">'10.0.0.5'</span>,
+  tags: [<span class="c-str">'prod'</span>, <span class="c-str">'nginx'</span>]
+};
+
+server.name          <span class="c-com">// доступ через точку</span>
+server[<span class="c-str">'ip'</span>]         <span class="c-com">// через скобки (ключ может быть переменной)</span>
+<span class="c-fn">Object.keys</span>(server)  <span class="c-com">// ['name', 'ip', 'tags']</span>
+<span class="c-fn">Object.entries</span>(server) <span class="c-com">// [['name','web-01'], ...]</span></code></pre>
+<p>Spread-оператор <code>...</code> — стандартный способ копировать и объединять объекты:</p>
+<pre><code><span class="c-kw">const</span> merged = { ...defaults, ...overrides };
+<span class="c-com">// при совпадении ключей побеждает то, что правее</span></code></pre>
+<p>Шаблонные строки в обратных кавычках позволяют вставлять переменные: <code>\`\${name}: \${status}\`</code> — забудь про конкатенацию плюсами.</p>`,
+  tasks:[
+  {
+    id:'m4t1', title:'serverInfo()', tag:'свойства',
+    desc:`Функция <code>serverInfo(server)</code> принимает объект <code>{name, ip, status}</code> и возвращает строку формата <code>name (ip): status</code>.<span class="io">serverInfo({name:'web-01', ip:'10.0.0.5', status:'online'})
+→ 'web-01 (10.0.0.5): online'</span>`,
+    starter:"function serverInfo(server) {\n  // шаблонная строка в обратных кавычках\n}",
+    fname:'serverInfo',
+    tests:[
+      {args:[{name:'web-01',ip:'10.0.0.5',status:'online'}],exp:'web-01 (10.0.0.5): online'},
+      {args:[{name:'db-02',ip:'10.0.1.7',status:'offline'}],exp:'db-02 (10.0.1.7): offline'}
+    ],
+    hint:'return `${server.name} (${server.ip}): ${server.status}`;',
+    solution:"function serverInfo(server) {\n  return `${server.name} (${server.ip}): ${server.status}`;\n}"
+  },
+  {
+    id:'m4t2', title:'countKeys()', tag:'Object.keys',
+    desc:`Функция <code>countKeys(obj)</code> возвращает количество собственных ключей объекта.<span class="io">countKeys({a:1, b:2, c:3}) → 3
+countKeys({})              → 0</span>`,
+    starter:"function countKeys(obj) {\n  // одна строка\n}",
+    fname:'countKeys',
+    tests:[{args:[{a:1,b:2,c:3}],exp:3},{args:[{}],exp:0},{args:[{x:null}],exp:1}],
+    hint:'Object.keys(obj) возвращает массив ключей, у массива есть .length.',
+    solution:"function countKeys(obj) {\n  return Object.keys(obj).length;\n}"
+  },
+  {
+    id:'m4t3', title:'mergeConfigs()', tag:'spread',
+    desc:`Функция <code>mergeConfigs(base, override)</code> возвращает <b>новый</b> объект: все ключи из <code>base</code>, поверх — ключи из <code>override</code>. Исходные объекты менять нельзя.<span class="io">mergeConfigs({port:8080, host:'0.0.0.0'}, {port:3000})
+→ {port:3000, host:'0.0.0.0'}</span>`,
+    starter:"function mergeConfigs(base, override) {\n  // spread\n}",
+    fname:'mergeConfigs',
+    tests:[
+      {args:[{port:8080,host:'0.0.0.0'},{port:3000}],exp:{port:3000,host:'0.0.0.0'}},
+      {args:[{a:1},{b:2}],exp:{a:1,b:2}},
+      {args:[{},{x:1}],exp:{x:1}}
+    ],
+    hint:'return { ...base, ...override };',
+    solution:"function mergeConfigs(base, override) {\n  return { ...base, ...override };\n}"
+  }]
+},
+/* ---------- 05 ---------- */
+{
+  id:'m5', title:'Методы массивов',
+  desc:'map / filter / reduce — три кита. 80% работы с данными в JS делается ими.',
+  links:[['Методы массивов','https://javascript.info/array-methods']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">const</span> nums = [<span class="c-num">1</span>, <span class="c-num">2</span>, <span class="c-num">3</span>, <span class="c-num">4</span>];
+
+nums.<span class="c-fn">map</span>(n =&gt; n * <span class="c-num">2</span>)        <span class="c-com">// [2,4,6,8] — преобразовать каждый</span>
+nums.<span class="c-fn">filter</span>(n =&gt; n &gt; <span class="c-num">2</span>)     <span class="c-com">// [3,4] — оставить подходящие</span>
+nums.<span class="c-fn">reduce</span>((acc, n) =&gt; acc + n, <span class="c-num">0</span>)  <span class="c-com">// 10 — свернуть в одно значение</span>
+nums.<span class="c-fn">find</span>(n =&gt; n &gt; <span class="c-num">2</span>)       <span class="c-com">// 3 — первый подходящий</span>
+nums.<span class="c-fn">some</span>(n =&gt; n &gt; <span class="c-num">3</span>)       <span class="c-com">// true — хоть один?</span>
+nums.<span class="c-fn">includes</span>(<span class="c-num">3</span>)            <span class="c-com">// true</span></code></pre>
+<p>Методы можно объединять в цепочки: <code>servers.filter(...).map(...)</code>. Это идиоматичный JS — на код-ревью цикл <code>for</code> там, где напрашивается <code>filter</code>, будут просить переписать.</p>
+<p>Важно про <code>sort</code>: он <b>мутирует</b> исходный массив и по умолчанию сортирует как строки. Для чисел нужен компаратор: <code>arr.sort((a, b) =&gt; a - b)</code>. Чтобы не трогать оригинал — сначала копия: <code>[...arr].sort(...)</code>.</p>`,
+  tasks:[
+  {
+    id:'m5t1', title:'onlineNames()', tag:'filter + map',
+    desc:`Функция <code>onlineNames(servers)</code> принимает массив серверов <code>{name, status}</code> и возвращает массив <b>имён</b> тех, у кого <code>status === 'online'</code>.<span class="io">onlineNames([
+  {name:'web-01', status:'online'},
+  {name:'db-01',  status:'offline'},
+  {name:'web-02', status:'online'}
+]) → ['web-01', 'web-02']</span>`,
+    starter:"function onlineNames(servers) {\n  // цепочка filter → map\n}",
+    fname:'onlineNames',
+    tests:[
+      {args:[[{name:'web-01',status:'online'},{name:'db-01',status:'offline'},{name:'web-02',status:'online'}]],exp:['web-01','web-02']},
+      {args:[[{name:'a',status:'offline'}]],exp:[]},
+      {args:[[]],exp:[]}
+    ],
+    hint:"servers.filter(s => s.status === 'online').map(s => s.name)",
+    solution:"function onlineNames(servers) {\n  return servers\n    .filter(s => s.status === 'online')\n    .map(s => s.name);\n}"
+  },
+  {
+    id:'m5t2', title:'totalMemory()', tag:'reduce',
+    desc:`Функция <code>totalMemory(servers)</code> суммирует поле <code>mem</code> (в ГБ) по всем серверам через <code>reduce</code>.<span class="io">totalMemory([{mem:16}, {mem:32}, {mem:8}]) → 56
+totalMemory([]) → 0</span>`,
+    starter:"function totalMemory(servers) {\n  // reduce с начальным значением 0\n}",
+    fname:'totalMemory',
+    tests:[
+      {args:[[{mem:16},{mem:32},{mem:8}]],exp:56},
+      {args:[[]],exp:0},
+      {args:[[{mem:64}]],exp:64}
+    ],
+    hint:'servers.reduce((acc, s) => acc + s.mem, 0) — второй аргумент reduce это стартовое значение аккумулятора.',
+    solution:"function totalMemory(servers) {\n  return servers.reduce((acc, s) => acc + s.mem, 0);\n}"
+  },
+  {
+    id:'m5t3', title:'sortByUptime()', tag:'sort без мутации',
+    desc:`Функция <code>sortByUptime(servers)</code> возвращает <b>новый</b> массив, отсортированный по полю <code>uptime</code> по убыванию. Исходный массив должен остаться нетронутым — тест это проверит!<span class="io">sortByUptime([{name:'a', uptime:99.5}, {name:'b', uptime:99.9}])
+→ [{name:'b', uptime:99.9}, {name:'a', uptime:99.5}]</span>`,
+    starter:"function sortByUptime(servers) {\n  // копия + sort с компаратором\n}",
+    fname:'sortByUptime',
+    tests:[
+      {args:[[{name:'a',uptime:99.5},{name:'b',uptime:99.9}]],exp:[{name:'b',uptime:99.9},{name:'a',uptime:99.5}]},
+      {custom:'noMutate'}
+    ],
+    hint:'return [...servers].sort((a, b) => b.uptime - a.uptime); Спред-копия защищает оригинал, b - a даёт убывание.',
+    solution:"function sortByUptime(servers) {\n  return [...servers].sort((a, b) => b.uptime - a.uptime);\n}"
+  }]
+},
+/* ---------- 06 ---------- */
+{
+  id:'m6', title:'Строки и деструктуризация',
+  desc:'Парсинг строк (привет, логи) и современный синтаксис распаковки.',
+  links:[['Строки','https://javascript.info/string'],['Деструктуризация','https://javascript.info/destructuring-assignment']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">const</span> line = <span class="c-str">'2026-07-05 ERROR disk full'</span>;
+line.<span class="c-fn">split</span>(<span class="c-str">' '</span>)       <span class="c-com">// ['2026-07-05','ERROR','disk','full']</span>
+line.<span class="c-fn">includes</span>(<span class="c-str">'ERROR'</span>) <span class="c-com">// true</span>
+line.<span class="c-fn">startsWith</span>(<span class="c-str">'2026'</span>)<span class="c-com">// true</span>
+line.<span class="c-fn">trim</span>()            <span class="c-com">// убрать пробелы по краям</span>
+[<span class="c-str">'a'</span>,<span class="c-str">'b'</span>].<span class="c-fn">join</span>(<span class="c-str">'='</span>)   <span class="c-com">// 'a=b'</span></code></pre>
+<p>Деструктуризация — распаковка массивов и объектов в переменные:</p>
+<pre><code><span class="c-kw">const</span> [first, second, ...rest] = [<span class="c-num">1</span>, <span class="c-num">2</span>, <span class="c-num">3</span>, <span class="c-num">4</span>];
+<span class="c-com">// first=1, second=2, rest=[3,4]</span>
+
+<span class="c-kw">const</span> { name, ip } = server;
+<span class="c-com">// вместо server.name, server.ip</span>
+
+<span class="c-kw">function</span> <span class="c-fn">deploy</span>({ host, port = <span class="c-num">22</span> }) { ... }
+<span class="c-com">// деструктуризация прямо в параметрах, с дефолтом</span></code></pre>`,
+  tasks:[
+  {
+    id:'m6t1', title:'parseLogLine()', tag:'split',
+    desc:`Функция <code>parseLogLine(line)</code> разбирает строку лога формата <code>«дата уровень сообщение»</code> и возвращает объект <code>{date, level, message}</code>. Сообщение может содержать пробелы!<span class="io">parseLogLine('2026-07-05 ERROR disk full on /dev/sda1')
+→ {date:'2026-07-05', level:'ERROR', message:'disk full on /dev/sda1'}</span>`,
+    starter:"function parseLogLine(line) {\n  // split + деструктуризация с ...rest\n}",
+    fname:'parseLogLine',
+    tests:[
+      {args:['2026-07-05 ERROR disk full on /dev/sda1'],exp:{date:'2026-07-05',level:'ERROR',message:'disk full on /dev/sda1'}},
+      {args:['2026-07-04 INFO started'],exp:{date:'2026-07-04',level:'INFO',message:'started'}}
+    ],
+    hint:"const [date, level, ...rest] = line.split(' '); message = rest.join(' ')",
+    solution:"function parseLogLine(line) {\n  const [date, level, ...rest] = line.split(' ');\n  return { date, level, message: rest.join(' ') };\n}"
+  },
+  {
+    id:'m6t2', title:'formatEnv()', tag:'entries + join',
+    desc:`Функция <code>formatEnv(obj)</code> превращает объект в строку переменных окружения: пары <code>KEY=value</code>, разделённые символом <code>\\n</code>.<span class="io">formatEnv({PORT: 3000, NODE_ENV: 'prod'})
+→ 'PORT=3000\\nNODE_ENV=prod'</span>`,
+    starter:"function formatEnv(obj) {\n  // Object.entries → map → join('\\n')\n}",
+    fname:'formatEnv',
+    tests:[
+      {args:[{PORT:3000,NODE_ENV:'prod'}],exp:'PORT=3000\nNODE_ENV=prod'},
+      {args:[{A:'1'}],exp:'A=1'},
+      {args:[{}],exp:''}
+    ],
+    hint:"Object.entries даёт массив пар [key, value]. Деструктурируй их в map: .map(([k, v]) => `${k}=${v}`)",
+    solution:"function formatEnv(obj) {\n  return Object.entries(obj)\n    .map(([k, v]) => `${k}=${v}`)\n    .join('\\n');\n}"
+  },
+  {
+    id:'m6t3', title:'firstAndLast()', tag:'деструктуризация',
+    desc:`Функция <code>firstAndLast(arr)</code> возвращает объект <code>{first, last}</code> с первым и последним элементами массива.<span class="io">firstAndLast(['web-01','web-02','web-03'])
+→ {first:'web-01', last:'web-03'}</span>`,
+    starter:"function firstAndLast(arr) {\n  // подсказка: arr.at(-1) — последний элемент\n}",
+    fname:'firstAndLast',
+    tests:[
+      {args:[['web-01','web-02','web-03']],exp:{first:'web-01',last:'web-03'}},
+      {args:[[7]],exp:{first:7,last:7}}
+    ],
+    hint:'const [first] = arr; const last = arr.at(-1); Или arr[0] и arr[arr.length - 1].',
+    solution:"function firstAndLast(arr) {\n  const [first] = arr;\n  return { first, last: arr.at(-1) };\n}"
+  }]
+},
+/* ---------- 07 ---------- */
+{
+  id:'m7', title:'Замыкания',
+  desc:'Функции, которые помнят своё окружение. Топ-1 тема собеседований по JS.',
+  links:[['Замыкания','https://javascript.info/closure']],
+  theory:`<h3>// теория</h3>
+<p>Замыкание (closure) — функция, которая «запоминает» переменные из области видимости, где была создана, даже после того как внешняя функция завершилась.</p>
+<pre><code><span class="c-kw">function</span> <span class="c-fn">makeGreeter</span>(name) {
+  <span class="c-com">// name живёт здесь...</span>
+  <span class="c-kw">return</span> <span class="c-kw">function</span>() {
+    <span class="c-kw">return</span> <span class="c-str">'Hi, '</span> + name;  <span class="c-com">// ...и доступна тут даже потом</span>
+  };
+}
+<span class="c-kw">const</span> greet = <span class="c-fn">makeGreeter</span>(<span class="c-str">'Artem'</span>);
+<span class="c-fn">greet</span>(); <span class="c-com">// 'Hi, Artem' — makeGreeter давно завершилась, а name жива</span></code></pre>
+<p>На этом принципе строятся счётчики, кэши, rate-limiter'ы, приватное состояние. Каждый вызов внешней функции создаёт <b>своё</b> независимое окружение: два счётчика из одной фабрики не мешают друг другу.</p>`,
+  tasks:[
+  {
+    id:'m7t1', title:'makeCounter()', tag:'классика',
+    desc:`Функция <code>makeCounter()</code> возвращает функцию-счётчик: каждый вызов возвращает следующее число, начиная с 1. Два счётчика независимы.<span class="io">const c = makeCounter();
+c() → 1
+c() → 2
+const c2 = makeCounter();
+c2() → 1   // свой счёт</span>`,
+    starter:"function makeCounter() {\n  // переменная снаружи, функция внутри\n}",
+    fname:'makeCounter',
+    tests:[{custom:'counter'}],
+    hint:'let count = 0; return function() { count++; return count; };',
+    solution:"function makeCounter() {\n  let count = 0;\n  return function() {\n    count++;\n    return count;\n  };\n}"
+  },
+  {
+    id:'m7t2', title:'once()', tag:'обёртка',
+    desc:`Функция <code>once(fn)</code> возвращает обёртку: первый вызов выполняет <code>fn</code> и запоминает результат, все последующие возвращают запомненное, не вызывая <code>fn</code> снова. Так делают инициализацию, которая должна произойти ровно один раз.<span class="io">let calls = 0;
+const init = once(() => { calls++; return 'ready'; });
+init() → 'ready'
+init() → 'ready'
+calls  → 1   // fn вызвана лишь однажды</span>`,
+    starter:"function once(fn) {\n  // флаг + переменная для результата\n}",
+    fname:'once',
+    tests:[{custom:'once'}],
+    hint:'let called = false, result; в обёртке: if (!called) { result = fn(); called = true; } return result;',
+    solution:"function once(fn) {\n  let called = false;\n  let result;\n  return function() {\n    if (!called) {\n      result = fn();\n      called = true;\n    }\n    return result;\n  };\n}"
+  },
+  {
+    id:'m7t3', title:'rateLimiter()', tag:'devops-вкус',
+    desc:`Функция <code>rateLimiter(n)</code> возвращает функцию, которая первые <code>n</code> вызовов возвращает <code>true</code> (запрос разрешён), а дальше — всегда <code>false</code>.<span class="io">const allow = rateLimiter(2);
+allow() → true
+allow() → true
+allow() → false
+allow() → false</span>`,
+    starter:"function rateLimiter(n) {\n  // счётчик в замыкании\n}",
+    fname:'rateLimiter',
+    tests:[{custom:'ratelimit'}],
+    hint:'let used = 0; в обёртке: if (used < n) { used++; return true; } return false;',
+    solution:"function rateLimiter(n) {\n  let used = 0;\n  return function() {\n    if (used < n) {\n      used++;\n      return true;\n    }\n    return false;\n  };\n}"
+  }]
+},
+/* ---------- 08 ---------- */
+{
+  id:'m8', title:'Классы',
+  desc:'ООП-синтаксис. В старом Angular будешь видеть классы на каждом шагу.',
+  links:[['Классы','https://javascript.info/class'],['Геттеры/сеттеры','https://javascript.info/property-accessors']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">class</span> <span class="c-fn">Server</span> {
+  <span class="c-fn">constructor</span>(name, ip) {
+    <span class="c-kw">this</span>.name = name;   <span class="c-com">// this — текущий экземпляр</span>
+    <span class="c-kw">this</span>.ip = ip;
+  }
+  <span class="c-fn">info</span>() {
+    <span class="c-kw">return</span> \`\${<span class="c-kw">this</span>.name} @ \${<span class="c-kw">this</span>.ip}\`;
+  }
+  <span class="c-kw">get</span> <span class="c-fn">shortName</span>() {          <span class="c-com">// геттер: вызывается как свойство</span>
+    <span class="c-kw">return</span> <span class="c-kw">this</span>.name.<span class="c-fn">split</span>(<span class="c-str">'-'</span>)[<span class="c-num">0</span>];
+  }
+}
+
+<span class="c-kw">const</span> s = <span class="c-kw">new</span> <span class="c-fn">Server</span>(<span class="c-str">'web-01'</span>, <span class="c-str">'10.0.0.5'</span>);
+s.<span class="c-fn">info</span>();      <span class="c-com">// 'web-01 @ 10.0.0.5'</span>
+s.shortName;   <span class="c-com">// 'web' — без скобок!</span></code></pre>
+<p>Под капотом классы — синтаксический сахар над прототипами, но для практики достаточно знать сам синтаксис. В Angular каждый компонент и сервис — это класс.</p>`,
+  tasks:[
+  {
+    id:'m8t1', title:'class Server', tag:'constructor',
+    desc:`Объяви класс <code>Server</code> с конструктором <code>(name, ip)</code> и методом <code>info()</code>, который возвращает строку <code>name @ ip</code>.<span class="io">new Server('web-01', '10.0.0.5').info()
+→ 'web-01 @ 10.0.0.5'</span>`,
+    starter:"class Server {\n  // constructor + метод info()\n}",
+    fname:'Server',
+    tests:[{custom:'classServer'}],
+    hint:'В конструкторе: this.name = name; this.ip = ip. В методе используй шаблонную строку с this.name и this.ip.',
+    solution:"class Server {\n  constructor(name, ip) {\n    this.name = name;\n    this.ip = ip;\n  }\n  info() {\n    return `${this.name} @ ${this.ip}`;\n  }\n}"
+  },
+  {
+    id:'m8t2', title:'class Stack', tag:'методы',
+    desc:`Класс <code>Stack</code>: методы <code>push(x)</code>, <code>pop()</code> (возвращает и удаляет верхний элемент) и <code>size()</code>. Храни элементы во внутреннем массиве.<span class="io">const s = new Stack();
+s.push(1); s.push(2);
+s.pop()  → 2
+s.size() → 1</span>`,
+    starter:"class Stack {\n  constructor() {\n    this.items = [];\n  }\n  // push, pop, size\n}",
+    fname:'Stack',
+    tests:[{custom:'classStack'}],
+    hint:'У массива уже есть push() и pop() — просто делегируй им. size() — это this.items.length.',
+    solution:"class Stack {\n  constructor() {\n    this.items = [];\n  }\n  push(x) {\n    this.items.push(x);\n  }\n  pop() {\n    return this.items.pop();\n  }\n  size() {\n    return this.items.length;\n  }\n}"
+  },
+  {
+    id:'m8t3', title:'class Disk', tag:'getter',
+    desc:`Класс <code>Disk</code> с конструктором <code>(totalGb, usedGb)</code> и <b>геттером</b> <code>freePercent</code>, который возвращает процент свободного места, округлённый через <code>Math.round</code>.<span class="io">const d = new Disk(500, 400);
+d.freePercent → 20   // свойство, без скобок!</span>`,
+    starter:"class Disk {\n  constructor(totalGb, usedGb) {\n    // ...\n  }\n  // get freePercent() { ... }\n}",
+    fname:'Disk',
+    tests:[{custom:'classDisk'}],
+    hint:'get freePercent() { return Math.round((this.totalGb - this.usedGb) / this.totalGb * 100); }',
+    solution:"class Disk {\n  constructor(totalGb, usedGb) {\n    this.totalGb = totalGb;\n    this.usedGb = usedGb;\n  }\n  get freePercent() {\n    return Math.round((this.totalGb - this.usedGb) / this.totalGb * 100);\n  }\n}"
+  }]
+},
+/* ---------- 09 ---------- */
+{
+  id:'m9', title:'Асинхронность',
+  desc:'Promise, async/await — сердце Node.js. Без этого в JS-мире никуда.',
+  links:[['Промисы','https://javascript.info/promise-basics'],['async/await','https://javascript.info/async-await'],['Promise API','https://javascript.info/promise-api']],
+  theory:`<h3>// теория</h3>
+<p>Promise — объект-«обещание» будущего результата. Он либо выполнится (<code>resolve</code>), либо упадёт (<code>reject</code>).</p>
+<pre><code><span class="c-kw">const</span> p = <span class="c-kw">new</span> <span class="c-fn">Promise</span>((resolve, reject) =&gt; {
+  <span class="c-fn">setTimeout</span>(() =&gt; <span class="c-fn">resolve</span>(<span class="c-str">'done'</span>), <span class="c-num">1000</span>);
+});</code></pre>
+<p><code>async/await</code> — современный синтаксис работы с промисами. <code>async</code>-функция всегда возвращает промис; <code>await</code> «ждёт» результат, не блокируя остальной код:</p>
+<pre><code><span class="c-kw">async function</span> <span class="c-fn">deploy</span>() {
+  <span class="c-kw">try</span> {
+    <span class="c-kw">const</span> result = <span class="c-kw">await</span> <span class="c-fn">runStep</span>();
+    <span class="c-kw">return</span> result;
+  } <span class="c-kw">catch</span> (err) {
+    <span class="c-com">// сюда попадёт reject</span>
+  }
+}
+
+<span class="c-com">// параллельное выполнение нескольких промисов:</span>
+<span class="c-kw">const</span> results = <span class="c-kw">await</span> Promise.<span class="c-fn">all</span>([taskA(), taskB()]);</code></pre>`,
+  tasks:[
+  {
+    id:'m9t1', title:'delay()', tag:'new Promise',
+    desc:`Функция <code>delay(ms)</code> возвращает промис, который выполнится через <code>ms</code> миллисекунд со значением <code>'done'</code>. Это базовый «кирпичик» — sleep для JS.<span class="io">await delay(100) → 'done'  // через ~100мс</span>`,
+    starter:"function delay(ms) {\n  // new Promise + setTimeout\n}",
+    fname:'delay',
+    tests:[{custom:'delay'}],
+    hint:"return new Promise(resolve => setTimeout(() => resolve('done'), ms));",
+    solution:"function delay(ms) {\n  return new Promise(resolve => {\n    setTimeout(() => resolve('done'), ms);\n  });\n}"
+  },
+  {
+    id:'m9t2', title:'runAll()', tag:'Promise.all',
+    desc:`Функция <code>runAll(fns)</code> принимает массив async-функций, запускает их <b>параллельно</b> и возвращает промис с массивом результатов в том же порядке.<span class="io">await runAll([async () => 1, async () => 2]) → [1, 2]</span>`,
+    starter:"async function runAll(fns) {\n  // вызови каждую fn и собери промисы в Promise.all\n}",
+    fname:'runAll',
+    tests:[{custom:'runAll'}],
+    hint:'return Promise.all(fns.map(fn => fn())); — map превращает массив функций в массив промисов.',
+    solution:"async function runAll(fns) {\n  return Promise.all(fns.map(fn => fn()));\n}"
+  },
+  {
+    id:'m9t3', title:'retry()', tag:'devops-вкус',
+    desc:`Функция <code>retry(fn, attempts)</code> вызывает async-функцию <code>fn</code>. Если та упала (reject) — пробует снова, максимум <code>attempts</code> раз суммарно. Если все попытки провалились — пробрасывает последнюю ошибку. Так работает любой health-check с ретраями.<span class="io">// fn падает 2 раза, потом отдаёт 'ok'
+await retry(fn, 3) → 'ok'
+await retry(fn, 2) → выбросит ошибку</span>`,
+    starter:"async function retry(fn, attempts) {\n  // цикл + try/catch + await\n}",
+    fname:'retry',
+    tests:[{custom:'retry'}],
+    hint:'for (let i = 0; i < attempts; i++) { try { return await fn(); } catch (e) { if (i === attempts - 1) throw e; } }',
+    solution:"async function retry(fn, attempts) {\n  let lastErr;\n  for (let i = 0; i < attempts; i++) {\n    try {\n      return await fn();\n    } catch (e) {\n      lastErr = e;\n    }\n  }\n  throw lastErr;\n}"
+  }]
+},
+/* ---------- 10 ---------- */
+{
+  id:'m10', title:'JSON и try/catch',
+  desc:'JSON и обработка ошибок — через это в Node проходит всё.',
+  links:[['JSON','https://javascript.info/json'],['try...catch','https://javascript.info/try-catch']],
+  theory:`<h3>// теория</h3>
+<pre><code>JSON.<span class="c-fn">stringify</span>({port: <span class="c-num">3000</span>})   <span class="c-com">// '{"port":3000}' — объект → строка</span>
+JSON.<span class="c-fn">parse</span>(<span class="c-str">'{"port":3000}'</span>)    <span class="c-com">// {port: 3000} — строка → объект</span>
+
+<span class="c-com">// parse кидает исключение на кривом JSON — оборачиваем:</span>
+<span class="c-kw">try</span> {
+  <span class="c-kw">const</span> data = JSON.<span class="c-fn">parse</span>(raw);
+} <span class="c-kw">catch</span> (err) {
+  <span class="c-com">// err.message — что пошло не так</span>
+}</code></pre>
+<p>В Node.js через JSON проходит всё: конфиги, API-ответы, package.json, тела HTTP-запросов. Правило: <b>никогда не парси внешние данные без try/catch</b> — один кривой запрос уронит процесс.</p>
+<p>Финальные две задачи собирают вместе split, filter, reduce, async и обработку ошибок — как в реальном скрипте.</p>`,
+  tasks:[
+  {
+    id:'m10t1', title:'safeParse()', tag:'try/catch',
+    desc:`Функция <code>safeParse(str)</code> парсит JSON. При ошибке возвращает <code>null</code>, а не роняет программу.<span class="io">safeParse('{"a":1}')  → {a:1}
+safeParse('not json') → null</span>`,
+    starter:"function safeParse(str) {\n  // try / catch\n}",
+    fname:'safeParse',
+    tests:[
+      {args:['{"a":1}'],exp:{a:1}},
+      {args:['not json'],exp:null},
+      {args:['[1,2,3]'],exp:[1,2,3]},
+      {args:['{"broken":'],exp:null}
+    ],
+    hint:'try { return JSON.parse(str); } catch { return null; }',
+    solution:"function safeParse(str) {\n  try {\n    return JSON.parse(str);\n  } catch {\n    return null;\n  }\n}"
+  },
+  {
+    id:'m10t2', title:'analyzeLogs()', tag:'финал: логи',
+    desc:`Функция <code>analyzeLogs(lines)</code> принимает массив строк лога (формат: <code>дата УРОВЕНЬ сообщение</code>) и возвращает объект — количество строк по каждому уровню.<span class="io">analyzeLogs([
+  '2026-07-05 ERROR disk full',
+  '2026-07-05 INFO started',
+  '2026-07-05 ERROR oom killed'
+]) → {ERROR: 2, INFO: 1}</span>`,
+    starter:"function analyzeLogs(lines) {\n  // split для уровня + reduce (или цикл) для подсчёта\n}",
+    fname:'analyzeLogs',
+    tests:[
+      {args:[['2026-07-05 ERROR disk full','2026-07-05 INFO started','2026-07-05 ERROR oom killed']],exp:{ERROR:2,INFO:1}},
+      {args:[['a WARN x']],exp:{WARN:1}},
+      {args:[[]],exp:{}}
+    ],
+    hint:"Уровень — второе слово: line.split(' ')[1]. Копи в объект: acc[level] = (acc[level] ?? 0) + 1.",
+    solution:"function analyzeLogs(lines) {\n  return lines.reduce((acc, line) => {\n    const level = line.split(' ')[1];\n    acc[level] = (acc[level] ?? 0) + 1;\n    return acc;\n  }, {});\n}"
+  },
+  {
+    id:'m10t3', title:'healthCheck()', tag:'финал: async',
+    desc:`Функция <code>healthCheck(services)</code>: каждый сервис — объект <code>{name, check}</code>, где <code>check</code> — async-функция, возвращающая <code>true</code>/<code>false</code> (и может упасть с reject!). Верни промис с массивом имён «здоровых» сервисов. Упавший check считается нездоровым. Проверки должны идти параллельно.<span class="io">await healthCheck([
+  {name:'api', check: async () => true},
+  {name:'db',  check: async () => false},
+  {name:'mq',  check: async () => { throw new Error('down') }}
+]) → ['api']</span>`,
+    starter:"async function healthCheck(services) {\n  // map → промисы с try/catch → Promise.all → filter\n}",
+    fname:'healthCheck',
+    tests:[{custom:'health'}],
+    hint:'Оберни каждый check: async s => { try { return {name: s.name, ok: await s.check()}; } catch { return {name: s.name, ok: false}; } }. Потом Promise.all и filter+map.',
+    solution:"async function healthCheck(services) {\n  const results = await Promise.all(\n    services.map(async s => {\n      try {\n        return { name: s.name, ok: await s.check() };\n      } catch {\n        return { name: s.name, ok: false };\n      }\n    })\n  );\n  return results.filter(r => r.ok).map(r => r.name);\n}"
+  }]
+},
+/* ---------- 11 ---------- */
+{
+  id:'m11', title:'this и optional chaining',
+  desc:'Методы объектов, контекст this и безопасный доступ через ?.',
+  links:[['Методы и this','https://javascript.info/object-methods'],['Optional chaining','https://javascript.info/optional-chaining']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">const</span> server = {
+  name: <span class="c-str">'web-01'</span>,
+  <span class="c-fn">hello</span>() {                        <span class="c-com">// сокращённая запись метода</span>
+    <span class="c-kw">return</span> <span class="c-str">'I am '</span> + <span class="c-kw">this</span>.name;   <span class="c-com">// this — объект перед точкой</span>
+  }
+};
+server.<span class="c-fn">hello</span>(); <span class="c-com">// 'I am web-01'</span></code></pre>
+<p><code>this</code> определяется <b>в момент вызова</b>: кто перед точкой — тот и this. У стрелочных функций своего this нет — они берут его снаружи, поэтому методы объектов стрелками не пишут.</p>
+<p>Optional chaining <code>?.</code> — безопасный доступ вглубь объекта: если слева <code>null</code>/<code>undefined</code>, выражение сразу вернёт <code>undefined</code> вместо падения:</p>
+<pre><code>config?.db?.host          <span class="c-com">// не упадёт, даже если config === null</span>
+config?.db?.host ?? <span class="c-str">'localhost'</span>  <span class="c-com">// частая пара: ?. + ??</span></code></pre>`,
+  tasks:[
+  {
+    id:'m11t1', title:'createServerObj()', tag:'this',
+    desc:`Функция <code>createServerObj(name)</code> возвращает объект со свойством <code>name</code> и методом <code>hello()</code>, который через <code>this</code> возвращает строку <code>I am имя</code>.<span class="io">const s = createServerObj('web-01');
+s.hello() → 'I am web-01'</span>`,
+    starter:"function createServerObj(name) {\n  return {\n    // свойство + метод с this\n  };\n}",
+    fname:'createServerObj',
+    tests:[{custom:'thisHello'}],
+    hint:"return { name, hello() { return 'I am ' + this.name; } }; Обычный метод, не стрелка!",
+    solution:"function createServerObj(name) {\n  return {\n    name,\n    hello() {\n      return 'I am ' + this.name;\n    }\n  };\n}"
+  },
+  {
+    id:'m11t2', title:'getDbHost()', tag:'?.',
+    desc:`Функция <code>getDbHost(config)</code> достаёт <code>config.db.host</code>, не падая на любом уровне. Если чего-то нет — верни <code>'localhost'</code>.<span class="io">getDbHost({db: {host: '10.0.0.7'}}) → '10.0.0.7'
+getDbHost({db: {}})                 → 'localhost'
+getDbHost({})                       → 'localhost'
+getDbHost(null)                     → 'localhost'</span>`,
+    starter:"function getDbHost(config) {\n  // ?. и ??\n}",
+    fname:'getDbHost',
+    tests:[
+      {args:[{db:{host:'10.0.0.7'}}],exp:'10.0.0.7'},
+      {args:[{db:{}}],exp:'localhost'},
+      {args:[{}],exp:'localhost'},
+      {args:[null],exp:'localhost'}
+    ],
+    hint:"return config?.db?.host ?? 'localhost';",
+    solution:"function getDbHost(config) {\n  return config?.db?.host ?? 'localhost';\n}"
+  },
+  {
+    id:'m11t3', title:'createCounter()', tag:'состояние в объекте',
+    desc:`Функция <code>createCounter()</code> возвращает объект: свойство <code>count</code> (с нуля) и метод <code>inc()</code>, который увеличивает <code>this.count</code> и возвращает новое значение.<span class="io">const c = createCounter();
+c.inc()  → 1
+c.inc()  → 2
+c.count  → 2</span>`,
+    starter:"function createCounter() {\n  return {\n    count: 0,\n    // inc()\n  };\n}",
+    fname:'createCounter',
+    tests:[{custom:'counterObj'}],
+    hint:'inc() { this.count++; return this.count; }',
+    solution:"function createCounter() {\n  return {\n    count: 0,\n    inc() {\n      this.count++;\n      return this.count;\n    }\n  };\n}"
+  }]
+},
+/* ---------- 12 ---------- */
+{
+  id:'m12', title:'Map и Set',
+  desc:'Коллекции для уникальности и пар ключ-значение с любыми типами ключей.',
+  links:[['Map и Set','https://javascript.info/map-set']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-com">// Set — коллекция уникальных значений</span>
+<span class="c-kw">const</span> ips = <span class="c-kw">new</span> <span class="c-fn">Set</span>([<span class="c-str">'10.0.0.1'</span>, <span class="c-str">'10.0.0.1'</span>, <span class="c-str">'10.0.0.2'</span>]);
+ips.size            <span class="c-com">// 2 — дубликат схлопнулся</span>
+ips.<span class="c-fn">has</span>(<span class="c-str">'10.0.0.1'</span>) <span class="c-com">// true</span>
+[...ips]            <span class="c-com">// обратно в массив через spread</span>
+
+<span class="c-com">// Map — ключ-значение, ключ может быть чем угодно</span>
+<span class="c-kw">const</span> m = <span class="c-kw">new</span> <span class="c-fn">Map</span>();
+m.<span class="c-fn">set</span>(<span class="c-str">'errors'</span>, <span class="c-num">5</span>);
+m.<span class="c-fn">get</span>(<span class="c-str">'errors'</span>)  <span class="c-com">// 5</span>
+m.<span class="c-fn">has</span>(<span class="c-str">'warn'</span>)    <span class="c-com">// false</span>
+m.size</code></pre>
+<p>Идиома дедупликации массива, встречается постоянно: <code>[...new Set(arr)]</code>. Отличие Map от объекта: ключи любого типа, гарантированный порядок вставки, удобный <code>size</code>, и нет риска конфликта с прототипными свойствами.</p>`,
+  tasks:[
+  {
+    id:'m12t1', title:'uniq()', tag:'Set',
+    desc:`Функция <code>uniq(arr)</code> возвращает массив без дубликатов, сохраняя порядок первого вхождения.<span class="io">uniq([1, 2, 2, 3, 1]) → [1, 2, 3]
+uniq(['a', 'a'])      → ['a']</span>`,
+    starter:"function uniq(arr) {\n  // одна строка через Set\n}",
+    fname:'uniq',
+    tests:[
+      {args:[[1,2,2,3,1]],exp:[1,2,3]},
+      {args:[['a','a']],exp:['a']},
+      {args:[[]],exp:[]}
+    ],
+    hint:'return [...new Set(arr)];',
+    solution:"function uniq(arr) {\n  return [...new Set(arr)];\n}"
+  },
+  {
+    id:'m12t2', title:'wordFreq()', tag:'Map',
+    desc:`Функция <code>wordFreq(words)</code> принимает массив слов и возвращает <b>Map</b>: слово → сколько раз встретилось.<span class="io">wordFreq(['error', 'ok', 'error'])
+→ Map { 'error' → 2, 'ok' → 1 }</span>`,
+    starter:"function wordFreq(words) {\n  const map = new Map();\n  // цикл + get/set\n  return map;\n}",
+    fname:'wordFreq',
+    tests:[{custom:'freqMap'}],
+    hint:'Для каждого слова: map.set(w, (map.get(w) ?? 0) + 1);',
+    solution:"function wordFreq(words) {\n  const map = new Map();\n  for (const w of words) {\n    map.set(w, (map.get(w) ?? 0) + 1);\n  }\n  return map;\n}"
+  },
+  {
+    id:'m12t3', title:'intersection()', tag:'Set.has',
+    desc:`Функция <code>intersection(a, b)</code> возвращает массив элементов, которые есть в обоих массивах. Используй Set для быстрой проверки принадлежности.<span class="io">intersection([1,2,3], [2,3,4]) → [2, 3]
+intersection(['x'], ['y'])     → []</span>`,
+    starter:"function intersection(a, b) {\n  // Set из b + filter по a\n}",
+    fname:'intersection',
+    tests:[
+      {args:[[1,2,3],[2,3,4]],exp:[2,3]},
+      {args:[['x'],['y']],exp:[]},
+      {args:[[],[1]],exp:[]}
+    ],
+    hint:'const setB = new Set(b); return a.filter(x => setB.has(x));',
+    solution:"function intersection(a, b) {\n  const setB = new Set(b);\n  return a.filter(x => setB.has(x));\n}"
+  }]
+},
+/* ---------- 13 ---------- */
+{
+  id:'m13', title:'Классы: наследование',
+  desc:'extends, super, static и приватные поля — весь ООП-арсенал разом.',
+  links:[['Наследование','https://javascript.info/class-inheritance'],['Статические свойства','https://javascript.info/static-properties-methods'],['Приватные поля','https://javascript.info/private-protected-properties-methods']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">class</span> <span class="c-fn">Server</span> {
+  <span class="c-fn">constructor</span>(name) { <span class="c-kw">this</span>.name = name; }
+  <span class="c-fn">info</span>() { <span class="c-kw">return</span> <span class="c-kw">this</span>.name; }
+}
+
+<span class="c-kw">class</span> <span class="c-fn">WebServer</span> <span class="c-kw">extends</span> <span class="c-fn">Server</span> {
+  <span class="c-fn">constructor</span>(name, engine) {
+    <span class="c-kw">super</span>(name);              <span class="c-com">// вызов родительского конструктора — обязателен и первым</span>
+    <span class="c-kw">this</span>.engine = engine;
+  }
+  <span class="c-fn">info</span>() {
+    <span class="c-kw">return</span> <span class="c-kw">super</span>.<span class="c-fn">info</span>() + <span class="c-str">' ['</span> + <span class="c-kw">this</span>.engine + <span class="c-str">']'</span>;  <span class="c-com">// super.метод — родительская версия</span>
+  }
+}</code></pre>
+<ul>
+<li><code>static</code> — метод самого класса, а не экземпляра: <code>Server.compare(a, b)</code>. Часто это фабрики: <code>User.fromJSON(str)</code></li>
+<li><code>#field</code> — приватное поле, снаружи класса недоступно вообще (не «по договорённости», а на уровне языка)</li>
+</ul>
+<p>В Angular наследование и приватные поля — повседневность, эта тема окупится сразу.</p>`,
+  tasks:[
+  {
+    id:'m13t1', title:'extends + super', tag:'наследование',
+    desc:`Дан класс <code>Server</code>. Напиши класс <code>WebServer</code>, наследующий его: конструктор <code>(name, ip, engine)</code> вызывает <code>super(name, ip)</code> и сохраняет <code>engine</code>; метод <code>info()</code> возвращает родительский <code>info()</code> плюс <code> [engine]</code>.<span class="io">new WebServer('web-01', '10.0.0.5', 'nginx').info()
+→ 'web-01 @ 10.0.0.5 [nginx]'</span>`,
+    starter:"class Server {\n  constructor(name, ip) {\n    this.name = name;\n    this.ip = ip;\n  }\n  info() {\n    return this.name + ' @ ' + this.ip;\n  }\n}\n\nclass WebServer extends Server {\n  // constructor + переопределённый info()\n}",
+    fname:'WebServer',
+    tests:[{custom:'classWeb'}],
+    hint:'В конструкторе сначала super(name, ip), потом this.engine = engine. В info(): return super.info() + \" [\" + this.engine + \"]\";',
+    solution:"class Server {\n  constructor(name, ip) {\n    this.name = name;\n    this.ip = ip;\n  }\n  info() {\n    return this.name + ' @ ' + this.ip;\n  }\n}\n\nclass WebServer extends Server {\n  constructor(name, ip, engine) {\n    super(name, ip);\n    this.engine = engine;\n  }\n  info() {\n    return super.info() + ' [' + this.engine + ']';\n  }\n}"
+  },
+  {
+    id:'m13t2', title:'static-фабрика', tag:'static',
+    desc:`Класс <code>Temperature</code>: конструктор принимает градусы Цельсия и кладёт в <code>this.celsius</code>. Добавь <b>статический</b> метод <code>fromFahrenheit(f)</code>, создающий экземпляр из Фаренгейта: <code>C = (F − 32) / 1.8</code>.<span class="io">Temperature.fromFahrenheit(212).celsius → 100
+Temperature.fromFahrenheit(32).celsius  → 0</span>`,
+    starter:"class Temperature {\n  constructor(celsius) {\n    this.celsius = celsius;\n  }\n  // static fromFahrenheit(f) { ... }\n}",
+    fname:'Temperature',
+    tests:[{custom:'classStatic'}],
+    hint:'static fromFahrenheit(f) { return new Temperature((f - 32) / 1.8); }',
+    solution:"class Temperature {\n  constructor(celsius) {\n    this.celsius = celsius;\n  }\n  static fromFahrenheit(f) {\n    return new Temperature((f - 32) / 1.8);\n  }\n}"
+  },
+  {
+    id:'m13t3', title:'приватное поле', tag:'#private',
+    desc:`Класс <code>SecretCounter</code> с <b>приватным</b> полем <code>#count</code> (старт 0), методом <code>inc()</code> и геттером <code>value</code>. Снаружи до <code>#count</code> добраться нельзя — тест это проверит.<span class="io">const c = new SecretCounter();
+c.inc(); c.inc();
+c.value  → 2
+c.count  → undefined  // приватность!</span>`,
+    starter:"class SecretCounter {\n  #count = 0;\n  // inc() и get value()\n}",
+    fname:'SecretCounter',
+    tests:[{custom:'classPrivate'}],
+    hint:'inc() { this.#count++; } get value() { return this.#count; }',
+    solution:"class SecretCounter {\n  #count = 0;\n  inc() {\n    this.#count++;\n  }\n  get value() {\n    return this.#count;\n  }\n}"
+  }]
+},
+/* ---------- 14 ---------- */
+{
+  id:'m14', title:'Ошибки: свои классы',
+  desc:'Кастомные ошибки, throw и паттерн Result — как падать красиво.',
+  links:[['try...catch','https://javascript.info/try-catch'],['Кастомные ошибки','https://javascript.info/custom-errors']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">class</span> <span class="c-fn">ConfigError</span> <span class="c-kw">extends</span> <span class="c-fn">Error</span> {
+  <span class="c-fn">constructor</span>(message) {
+    <span class="c-kw">super</span>(message);            <span class="c-com">// message уедет в родителя</span>
+    <span class="c-kw">this</span>.name = <span class="c-str">'ConfigError'</span>; <span class="c-com">// иначе будет просто 'Error'</span>
+  }
+}
+
+<span class="c-kw">try</span> {
+  <span class="c-kw">throw new</span> <span class="c-fn">ConfigError</span>(<span class="c-str">'port missing'</span>);
+} <span class="c-kw">catch</span> (e) {
+  <span class="c-kw">if</span> (e <span class="c-kw">instanceof</span> <span class="c-fn">ConfigError</span>) { <span class="c-com">/* своя обработка */</span> }
+  <span class="c-kw">else throw</span> e;  <span class="c-com">// чужие ошибки пробрасываем дальше!</span>
+}</code></pre>
+<p>Свои классы ошибок позволяют в <code>catch</code> различать «ожидаемые» проблемы (кривой конфиг) и настоящие баги. Правило хорошего тона: ловишь только то, что умеешь обрабатывать, остальное — <code>throw</code> дальше.</p>`,
+  tasks:[
+  {
+    id:'m14t1', title:'class ConfigError', tag:'extends Error',
+    desc:`Объяви класс <code>ConfigError</code>, наследующий <code>Error</code>: принимает <code>message</code>, передаёт его родителю через <code>super</code> и ставит <code>this.name = 'ConfigError'</code>.<span class="io">const e = new ConfigError('port missing');
+e.message           → 'port missing'
+e.name              → 'ConfigError'
+e instanceof Error  → true</span>`,
+    starter:"class ConfigError extends Error {\n  // constructor\n}",
+    fname:'ConfigError',
+    tests:[{custom:'classError'}],
+    hint:"constructor(message) { super(message); this.name = 'ConfigError'; }",
+    solution:"class ConfigError extends Error {\n  constructor(message) {\n    super(message);\n    this.name = 'ConfigError';\n  }\n}"
+  },
+  {
+    id:'m14t2', title:'validatePort()', tag:'throw',
+    desc:`Функция <code>validatePort(p)</code> возвращает <code>p</code>, если это целое число от 1 до 65535. Иначе — <b>бросает</b> <code>Error</code> (через <code>throw</code>).<span class="io">validatePort(8080)  → 8080
+validatePort(0)     → throw!
+validatePort(99999) → throw!
+validatePort('80')  → throw! (строка — не число)</span>`,
+    starter:"function validatePort(p) {\n  // Number.isInteger + диапазон, иначе throw new Error(...)\n}",
+    fname:'validatePort',
+    tests:[{custom:'validate'}],
+    hint:"if (!Number.isInteger(p) || p < 1 || p > 65535) throw new Error('invalid port'); return p;",
+    solution:"function validatePort(p) {\n  if (!Number.isInteger(p) || p < 1 || p > 65535) {\n    throw new Error('invalid port: ' + p);\n  }\n  return p;\n}"
+  },
+  {
+    id:'m14t3', title:'safeRun()', tag:'Result-паттерн',
+    desc:`Функция <code>safeRun(fn)</code> вызывает <code>fn()</code> и возвращает объект-результат: <code>{ok: true, value}</code> при успехе или <code>{ok: false, error}</code> с текстом ошибки при исключении. Так пишут код, где падение — часть нормального потока.<span class="io">safeRun(() => 42)
+→ {ok: true, value: 42}
+safeRun(() => { throw new Error('boom') })
+→ {ok: false, error: 'boom'}</span>`,
+    starter:"function safeRun(fn) {\n  // try/catch → объект\n}",
+    fname:'safeRun',
+    tests:[{custom:'safeRun'}],
+    hint:'try { return {ok: true, value: fn()}; } catch (e) { return {ok: false, error: e.message}; }',
+    solution:"function safeRun(fn) {\n  try {\n    return { ok: true, value: fn() };\n  } catch (e) {\n    return { ok: false, error: e.message };\n  }\n}"
+  }]
+},
+/* ---------- 15 ---------- */
+{
+  id:'m15', title:'setTimeout и планирование',
+  desc:'Таймеры, отмена и debounce — управление временем в JS.',
+  links:[['setTimeout/setInterval','https://javascript.info/settimeout-setinterval']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">const</span> id = <span class="c-fn">setTimeout</span>(() =&gt; <span class="c-fn">doWork</span>(), <span class="c-num">1000</span>); <span class="c-com">// один раз через 1с</span>
+<span class="c-fn">clearTimeout</span>(id);                            <span class="c-com">// отмена по id</span>
+
+<span class="c-fn">setInterval</span>(() =&gt; <span class="c-fn">ping</span>(), <span class="c-num">5000</span>);             <span class="c-com">// каждые 5с</span></code></pre>
+<p>Ключевое: <code>setTimeout(fn, 0)</code> — это НЕ «сразу». Колбэк уходит в очередь и выполнится после всего текущего синхронного кода. Это основа понимания event loop.</p>
+<p><b>Debounce</b> — классический паттерн на таймерах: «выполни функцию, только когда вызовы прекратились на N мс». Так делают поиск при вводе, автосохранение, реакцию на всплеск событий мониторинга. Каждый новый вызов отменяет предыдущий таймер и ставит свой.</p>`,
+  tasks:[
+  {
+    id:'m15t1', title:'delayCall()', tag:'setTimeout',
+    desc:`Функция <code>delayCall(fn, ms)</code> возвращает промис: через <code>ms</code> миллисекунд вызывает <code>fn()</code> и резолвится его результатом.<span class="io">await delayCall(() => 'pong', 50) → 'pong'  // через ~50мс</span>`,
+    starter:"function delayCall(fn, ms) {\n  // new Promise + setTimeout + resolve(fn())\n}",
+    fname:'delayCall',
+    tests:[{custom:'delayCall'}],
+    hint:'return new Promise(resolve => setTimeout(() => resolve(fn()), ms));',
+    solution:"function delayCall(fn, ms) {\n  return new Promise(resolve => {\n    setTimeout(() => resolve(fn()), ms);\n  });\n}"
+  },
+  {
+    id:'m15t2', title:'cancellable()', tag:'clearTimeout',
+    desc:`Функция <code>cancellable(fn, ms)</code> планирует вызов <code>fn</code> через <code>ms</code> и возвращает функцию отмены. Если отмену вызвали до срока — <code>fn</code> не выполнится вовсе.<span class="io">const cancel = cancellable(() => launchMissiles(), 100);
+cancel();  // фух, отменили</span>`,
+    starter:"function cancellable(fn, ms) {\n  // сохрани id таймера, верни функцию с clearTimeout\n}",
+    fname:'cancellable',
+    tests:[{custom:'cancellable'}],
+    hint:'const id = setTimeout(fn, ms); return () => clearTimeout(id);',
+    solution:"function cancellable(fn, ms) {\n  const id = setTimeout(fn, ms);\n  return () => clearTimeout(id);\n}"
+  },
+  {
+    id:'m15t3', title:'debounce()', tag:'классика',
+    desc:`Функция <code>debounce(fn, ms)</code> возвращает обёртку: <code>fn</code> выполнится только когда после последнего вызова прошло <code>ms</code> без новых. Серия быстрых вызовов схлопывается в один.<span class="io">const save = debounce(doSave, 100);
+save(); save(); save();
+// ...через 100мс тишины doSave выполнится один раз</span>`,
+    starter:"function debounce(fn, ms) {\n  let timerId;\n  return function(...args) {\n    // отмени старый таймер, поставь новый\n  };\n}",
+    fname:'debounce',
+    tests:[{custom:'debounce'}],
+    hint:'В обёртке: clearTimeout(timerId); timerId = setTimeout(() => fn(...args), ms);',
+    solution:"function debounce(fn, ms) {\n  let timerId;\n  return function(...args) {\n    clearTimeout(timerId);\n    timerId = setTimeout(() => fn(...args), ms);\n  };\n}"
+  }]
+},
+/* ---------- 16 ---------- */
+{
+  id:'m16', title:'Декораторы и bind',
+  desc:'Обёртки над функциями: подсчёт вызовов, кэширование, фиксация this.',
+  links:[['Декораторы, call/apply','https://javascript.info/call-apply-decorators'],['bind','https://javascript.info/bind']],
+  theory:`<h3>// теория</h3>
+<p>Декоратор — функция, которая берёт функцию и возвращает её «улучшенную» версию, не меняя оригинал. Ты уже писал два: <code>once()</code> и <code>debounce()</code>. Общий шаблон:</p>
+<pre><code><span class="c-kw">function</span> <span class="c-fn">logCalls</span>(fn) {
+  <span class="c-kw">return function</span>(...args) {      <span class="c-com">// ...args собирает все аргументы</span>
+    console.<span class="c-fn">log</span>(<span class="c-str">'called'</span>);
+    <span class="c-kw">return</span> <span class="c-fn">fn</span>(...args);          <span class="c-com">// ...args раскладывает обратно</span>
+  };
+}</code></pre>
+<p><code>bind</code> решает проблему «потерянного this»: когда метод отрывают от объекта (передают как колбэк), <code>this</code> теряется. <code>obj.method.bind(obj)</code> возвращает версию метода с навсегда привязанным this:</p>
+<pre><code><span class="c-kw">const</span> f = server.info;        <span class="c-com">// this потерян, f() упадёт или вернёт мусор</span>
+<span class="c-kw">const</span> g = server.info.<span class="c-fn">bind</span>(server);  <span class="c-com">// g() работает где угодно</span></code></pre>`,
+  tasks:[
+  {
+    id:'m16t1', title:'countCalls()', tag:'обёртка',
+    desc:`Декоратор <code>countCalls(fn)</code> возвращает обёртку, которая работает как <code>fn</code> (аргументы и результат проходят насквозь), но считает вызовы в своём свойстве <code>calls</code>.<span class="io">const wrapped = countCalls(x => x * 2);
+wrapped(5)     → 10
+wrapped(7)     → 14
+wrapped.calls  → 2</span>`,
+    starter:"function countCalls(fn) {\n  function wrapper(...args) {\n    // счётчик + проброс\n  }\n  wrapper.calls = 0;\n  return wrapper;\n}",
+    fname:'countCalls',
+    tests:[{custom:'countCalls'}],
+    hint:'Внутри wrapper: wrapper.calls++; return fn(...args); Функция — это объект, ей можно вешать свойства.',
+    solution:"function countCalls(fn) {\n  function wrapper(...args) {\n    wrapper.calls++;\n    return fn(...args);\n  }\n  wrapper.calls = 0;\n  return wrapper;\n}"
+  },
+  {
+    id:'m16t2', title:'memoize()', tag:'кэш',
+    desc:`Декоратор <code>memoize(fn)</code> кэширует результаты: при повторном вызове с теми же аргументами возвращает сохранённое, не вызывая <code>fn</code>. Ключ кэша — <code>JSON.stringify(args)</code>.<span class="io">const slow = memoize(heavyComputation);
+slow(42)  // считает
+slow(42)  // мгновенно из кэша, heavyComputation не вызвана</span>`,
+    starter:"function memoize(fn) {\n  const cache = new Map();\n  return function(...args) {\n    // ключ → проверка → вызов или кэш\n  };\n}",
+    fname:'memoize',
+    tests:[{custom:'memoize'}],
+    hint:'const key = JSON.stringify(args); if (cache.has(key)) return cache.get(key); const r = fn(...args); cache.set(key, r); return r;',
+    solution:"function memoize(fn) {\n  const cache = new Map();\n  return function(...args) {\n    const key = JSON.stringify(args);\n    if (cache.has(key)) return cache.get(key);\n    const result = fn(...args);\n    cache.set(key, result);\n    return result;\n  };\n}"
+  },
+  {
+    id:'m16t3', title:'fixContext()', tag:'bind',
+    desc:`Функция <code>fixContext(obj, methodName)</code> возвращает метод объекта с намертво привязанным <code>this</code> — чтобы его можно было передавать куда угодно как обычную функцию.<span class="io">const server = {name: 'web-01', getName() { return this.name; }};
+const f = fixContext(server, 'getName');
+f() → 'web-01'   // this не потерялся</span>`,
+    starter:"function fixContext(obj, methodName) {\n  // одна строка с bind\n}",
+    fname:'fixContext',
+    tests:[{custom:'fixContext'}],
+    hint:'return obj[methodName].bind(obj);',
+    solution:"function fixContext(obj, methodName) {\n  return obj[methodName].bind(obj);\n}"
+  }]
+},
+/* ---------- 17 ---------- */
+{
+  id:'m17', title:'Промисы: продвинутый уровень',
+  desc:'allSettled, гонки с таймаутом и последовательное выполнение.',
+  links:[['Promise API','https://javascript.info/promise-api'],['Обработка ошибок в промисах','https://javascript.info/promise-error-handling'],['Микрозадачи','https://javascript.info/microtask-queue']],
+  theory:`<h3>// теория</h3>
+<pre><code>Promise.<span class="c-fn">all</span>([...])        <span class="c-com">// всё или ничего: один reject валит всё</span>
+Promise.<span class="c-fn">allSettled</span>([...]) <span class="c-com">// ждёт ВСЕХ, отдаёт статусы:</span>
+<span class="c-com">// [{status:'fulfilled', value: ...}, {status:'rejected', reason: ...}]</span>
+Promise.<span class="c-fn">race</span>([...])       <span class="c-com">// кто первый — тот и результат (или ошибка)</span></code></pre>
+<p><code>allSettled</code> — рабочая лошадка мониторинга: опросить 50 хостов и получить полную картину, даже если половина лежит. <code>race</code> — стандартный способ приделать таймаут к любому промису: гонка между реальной операцией и «бомбой с часовым механизмом».</p>
+<p>Последовательное выполнение (когда параллельно нельзя — миграции, деплой по очереди) — это цикл с <code>await</code> внутри. Да, <code>await</code> в цикле, который линтеры любят подчёркивать — здесь он <b>намеренный</b>.</p>`,
+  tasks:[
+  {
+    id:'m17t1', title:'settleStats()', tag:'allSettled',
+    desc:`Функция <code>settleStats(promises)</code> ждёт все промисы и возвращает сводку: <code>{fulfilled: n, rejected: n}</code>.<span class="io">await settleStats([
+  Promise.resolve(1),
+  Promise.reject(new Error('x')),
+  Promise.resolve(2)
+]) → {fulfilled: 2, rejected: 1}</span>`,
+    starter:"async function settleStats(promises) {\n  // Promise.allSettled + подсчёт по status\n}",
+    fname:'settleStats',
+    tests:[{custom:'settled'}],
+    hint:"const results = await Promise.allSettled(promises); потом filter по r.status === 'fulfilled' и посчитай длины.",
+    solution:"async function settleStats(promises) {\n  const results = await Promise.allSettled(promises);\n  return {\n    fulfilled: results.filter(r => r.status === 'fulfilled').length,\n    rejected: results.filter(r => r.status === 'rejected').length\n  };\n}"
+  },
+  {
+    id:'m17t2', title:'withTimeout()', tag:'race',
+    desc:`Функция <code>withTimeout(promise, ms)</code> возвращает промис: если исходный успел за <code>ms</code> — его результат; не успел — reject с ошибкой <code>'timeout'</code>. Так оборачивают любой сетевой вызов.<span class="io">await withTimeout(fastOp(), 1000) → результат fastOp
+await withTimeout(slowOp(), 10)   → Error('timeout')</span>`,
+    starter:"function withTimeout(promise, ms) {\n  // Promise.race с промисом-таймером, который reject-ит\n}",
+    fname:'withTimeout',
+    tests:[{custom:'withTimeout'}],
+    hint:"Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))])",
+    solution:"function withTimeout(promise, ms) {\n  const timer = new Promise((_, reject) => {\n    setTimeout(() => reject(new Error('timeout')), ms);\n  });\n  return Promise.race([promise, timer]);\n}"
+  },
+  {
+    id:'m17t3', title:'runSequential()', tag:'await в цикле',
+    desc:`Функция <code>runSequential(fns)</code> выполняет async-функции <b>строго по очереди</b> (следующая стартует после завершения предыдущей) и возвращает массив результатов. Тест проверит и порядок, и последовательность по времени!<span class="io">await runSequential([stepA, stepB, stepC])
+→ [resA, resB, resC]  // B не начнётся, пока не кончится A</span>`,
+    starter:"async function runSequential(fns) {\n  const results = [];\n  // for...of + await\n  return results;\n}",
+    fname:'runSequential',
+    tests:[{custom:'sequential'}],
+    hint:'for (const fn of fns) { results.push(await fn()); } — await внутри цикла здесь и нужен.',
+    solution:"async function runSequential(fns) {\n  const results = [];\n  for (const fn of fns) {\n    results.push(await fn());\n  }\n  return results;\n}"
+  }]
+},
+/* ---------- 18 ---------- */
+{
+  id:'m18', title:'Регулярные выражения',
+  desc:'Парсинг логов, валидация, извлечение — хлеб системного инженера.',
+  links:[['Введение в regexp','https://javascript.info/regexp-introduction'],['Группы','https://javascript.info/regexp-groups'],['Методы','https://javascript.info/regexp-methods']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">const</span> re = /\\d+\\.\\d+\\.\\d+\\.\\d+/g;  <span class="c-com">// g — найти все, не только первое</span>
+
+<span class="c-str">'ip: 10.0.0.5'</span>.<span class="c-fn">match</span>(re)    <span class="c-com">// ['10.0.0.5'] или null, если нет!</span>
+re.<span class="c-fn">test</span>(<span class="c-str">'10.0.0.5'</span>)          <span class="c-com">// true/false — просто проверка</span>
+str.<span class="c-fn">replace</span>(re, <span class="c-str">'x.x.x.x'</span>)   <span class="c-com">// замена</span></code></pre>
+<p>Базовый синтаксис, покрывающий 90% задач: <code>\\d</code> цифра, <code>\\w</code> буква/цифра, <code>\\s</code> пробел, <code>.</code> любой символ, <code>+</code> один и более, <code>*</code> ноль и более, <code>^</code> начало строки, <code>$</code> конец, <code>[abc]</code> набор, <code>(...)</code> группа захвата.</p>
+<p>Именованные группы делают парсинг читаемым:</p>
+<pre><code><span class="c-kw">const</span> m = line.<span class="c-fn">match</span>(/(?&lt;ip&gt;\\S+) (?&lt;method&gt;\\w+)/);
+m.groups.ip      <span class="c-com">// доступ по имени, а не по номеру</span></code></pre>
+<p>Если regex из bash/grep тебе знаком — здесь всё то же самое, только с методами строк. Осторожно: <code>match</code> без совпадений возвращает <code>null</code>, не пустой массив.</p>`,
+  tasks:[
+  {
+    id:'m18t1', title:'extractIPs()', tag:'match + g',
+    desc:`Функция <code>extractIPs(text)</code> возвращает массив всех IPv4-адресов из текста (упрощённо: четыре группы цифр через точки). Если адресов нет — пустой массив, не null!<span class="io">extractIPs('srv 10.0.0.5 lost ping to 192.168.1.1')
+→ ['10.0.0.5', '192.168.1.1']
+extractIPs('no ips here') → []</span>`,
+    starter:"function extractIPs(text) {\n  // match с флагом g, не забудь про null\n}",
+    fname:'extractIPs',
+    tests:[
+      {args:['srv 10.0.0.5 lost ping to 192.168.1.1'],exp:['10.0.0.5','192.168.1.1']},
+      {args:['no ips here'],exp:[]},
+      {args:['65.109.132.177'],exp:['65.109.132.177']}
+    ],
+    hint:'return text.match(/\\d+\\.\\d+\\.\\d+\\.\\d+/g) ?? []; Точку в regex экранируй: \\. — иначе она значит «любой символ».',
+    solution:"function extractIPs(text) {\n  return text.match(/\\d+\\.\\d+\\.\\d+\\.\\d+/g) ?? [];\n}"
+  },
+  {
+    id:'m18t2', title:'isSemver()', tag:'test + якоря',
+    desc:`Функция <code>isSemver(str)</code> проверяет, что строка — версия вида <code>X.Y.Z</code> (три числа через точки, ничего лишнего вокруг).<span class="io">isSemver('1.2.3')    → true
+isSemver('10.20.30') → true
+isSemver('1.2')      → false
+isSemver('v1.2.3')   → false</span>`,
+    starter:"function isSemver(str) {\n  // ^ и $ обязательны, иначе 'v1.2.3' пройдёт\n}",
+    fname:'isSemver',
+    tests:[
+      {args:['1.2.3'],exp:true},{args:['10.20.30'],exp:true},
+      {args:['1.2'],exp:false},{args:['v1.2.3'],exp:false},
+      {args:['1.2.3.4'],exp:false}
+    ],
+    hint:'return /^\\d+\\.\\d+\\.\\d+$/.test(str);',
+    solution:"function isSemver(str) {\n  return /^\\d+\\.\\d+\\.\\d+$/.test(str);\n}"
+  },
+  {
+    id:'m18t3', title:'parseAccessLog()', tag:'группы',
+    desc:`Функция <code>parseAccessLog(line)</code> парсит строку access-лога формата <code>«ip METHOD /path status»</code> в объект <code>{ip, method, path, status}</code>, где status — <b>число</b>.<span class="io">parseAccessLog('192.168.1.10 GET /api/health 200')
+→ {ip:'192.168.1.10', method:'GET', path:'/api/health', status:200}</span>`,
+    starter:"function parseAccessLog(line) {\n  // match с группами захвата, Number() для статуса\n}",
+    fname:'parseAccessLog',
+    tests:[
+      {args:['192.168.1.10 GET /api/health 200'],exp:{ip:'192.168.1.10',method:'GET',path:'/api/health',status:200}},
+      {args:['10.0.0.1 POST /login 401'],exp:{ip:'10.0.0.1',method:'POST',path:'/login',status:401}}
+    ],
+    hint:"const m = line.match(/^(\\S+) (\\w+) (\\S+) (\\d+)$/); return {ip: m[1], method: m[2], path: m[3], status: Number(m[4])}; Или именованные группы (?<ip>\\S+).",
+    solution:"function parseAccessLog(line) {\n  const m = line.match(/^(?<ip>\\S+) (?<method>\\w+) (?<path>\\S+) (?<status>\\d+)$/);\n  const { ip, method, path, status } = m.groups;\n  return { ip, method, path, status: Number(status) };\n}"
+  }]
+},
+/* ---------- 19 ---------- */
+{
+  id:'m19', title:'Генераторы и итераторы',
+  desc:'Функции, которые умеют останавливаться. Финальный модуль.',
+  links:[['Генераторы','https://javascript.info/generators'],['Итераторы','https://javascript.info/iterable']],
+  theory:`<h3>// теория</h3>
+<pre><code><span class="c-kw">function*</span> <span class="c-fn">gen</span>() {      <span class="c-com">// звёздочка = генератор</span>
+  <span class="c-kw">yield</span> <span class="c-num">1</span>;             <span class="c-com">// «отдать значение и замереть»</span>
+  <span class="c-kw">yield</span> <span class="c-num">2</span>;
+  <span class="c-kw">yield</span> <span class="c-num">3</span>;
+}
+
+<span class="c-kw">const</span> g = <span class="c-fn">gen</span>();       <span class="c-com">// вызов НЕ выполняет тело — создаёт итератор</span>
+g.<span class="c-fn">next</span>()  <span class="c-com">// {value: 1, done: false}</span>
+g.<span class="c-fn">next</span>()  <span class="c-com">// {value: 2, done: false}</span>
+[...<span class="c-fn">gen</span>()] <span class="c-com">// [1, 2, 3] — spread выкачивает всё</span>
+<span class="c-kw">for</span> (<span class="c-kw">const</span> x <span class="c-kw">of</span> <span class="c-fn">gen</span>()) { ... } <span class="c-com">// и for..of понимает</span></code></pre>
+<p>Сила генераторов — ленивость: значения производятся по требованию. Можно описать бесконечную последовательность и брать из неё сколько нужно — памяти это не съест. В Node на этой механике построены стримы и построчное чтение гигабайтных логов.</p>`,
+  tasks:[
+  {
+    id:'m19t1', title:'range()', tag:'function*',
+    desc:`<b>Генератор</b> <code>range(a, b)</code> выдаёт числа от <code>a</code> до <code>b</code> включительно через <code>yield</code>.<span class="io">[...range(1, 4)] → [1, 2, 3, 4]
+for (const i of range(5, 7)) ...  // 5, 6, 7</span>`,
+    starter:"function* range(a, b) {\n  // цикл + yield\n}",
+    fname:'range',
+    tests:[{custom:'genRange'}],
+    hint:'for (let i = a; i <= b; i++) yield i;',
+    solution:"function* range(a, b) {\n  for (let i = a; i <= b; i++) {\n    yield i;\n  }\n}"
+  },
+  {
+    id:'m19t2', title:'take()', tag:'ленивость',
+    desc:`Функция <code>take(iterable, n)</code> забирает первые <code>n</code> значений из любого итерируемого (в том числе бесконечного генератора!) и возвращает их массивом.<span class="io">take(infiniteGen(), 3) → [первые, три, значения]
+take([10, 20, 30, 40], 2) → [10, 20]</span>`,
+    starter:"function take(iterable, n) {\n  const result = [];\n  // for..of с досрочным break\n  return result;\n}",
+    fname:'take',
+    tests:[{custom:'takeN'}],
+    hint:'for (const x of iterable) { result.push(x); if (result.length === n) break; } — break обязателен, иначе бесконечный генератор повесит вкладку.',
+    solution:"function take(iterable, n) {\n  const result = [];\n  for (const x of iterable) {\n    result.push(x);\n    if (result.length === n) break;\n  }\n  return result;\n}"
+  },
+  {
+    id:'m19t3', title:'idGenerator()', tag:'бесконечность',
+    desc:`<b>Бесконечный</b> генератор <code>idGenerator()</code>: выдаёт 1, 2, 3, … без остановки. Потребитель сам решит, сколько взять.<span class="io">const ids = idGenerator();
+ids.next().value → 1
+ids.next().value → 2
+// ...и так до тепловой смерти вселенной</span>`,
+    starter:"function* idGenerator() {\n  // while (true) — здесь это легально\n}",
+    fname:'idGenerator',
+    tests:[{custom:'idGen'}],
+    hint:'let id = 1; while (true) { yield id++; } Генератор замирает на yield, поэтому бесконечный цикл ничего не вешает.',
+    solution:"function* idGenerator() {\n  let id = 1;\n  while (true) {\n    yield id++;\n  }\n}"
+  }]
+}
+];
+
+/* =========================================================
+   КАСТОМНЫЕ ТЕСТЫ (для замыканий, классов, async)
+   ========================================================= */
+const CUSTOM_TESTS = {
+  noMutate: async (fn) => {
+    const orig = [{name:'x',uptime:1},{name:'y',uptime:2}];
+    const snapshot = JSON.stringify(orig);
+    fn(orig);
+    if (JSON.stringify(orig) !== snapshot) return {ok:false, msg:'исходный массив изменён (мутация!)'};
+    return {ok:true, msg:'исходный массив не мутирован'};
+  },
+  counter: async (fn) => {
+    const c1 = fn(), c2 = fn();
+    if (typeof c1 !== 'function') return {ok:false, msg:'makeCounter должна возвращать функцию'};
+    if (c1() !== 1) return {ok:false, msg:'первый вызов должен вернуть 1'};
+    if (c1() !== 2) return {ok:false, msg:'второй вызов должен вернуть 2'};
+    if (c2() !== 1) return {ok:false, msg:'второй счётчик должен считать независимо (ожидалось 1)'};
+    if (c1() !== 3) return {ok:false, msg:'первый счётчик сбился после создания второго'};
+    return {ok:true, msg:'счётчики работают и независимы'};
+  },
+  once: async (fn) => {
+    let calls = 0;
+    const wrapped = fn(() => { calls++; return 'ready'; });
+    if (typeof wrapped !== 'function') return {ok:false, msg:'once должна возвращать функцию'};
+    const r1 = wrapped(), r2 = wrapped(), r3 = wrapped();
+    if (r1 !== 'ready' || r2 !== 'ready' || r3 !== 'ready') return {ok:false, msg:"каждый вызов должен возвращать 'ready'"};
+    if (calls !== 1) return {ok:false, msg:`fn вызвана ${calls} раз(а), должна — ровно 1`};
+    return {ok:true, msg:'fn вызвана ровно один раз, результат кэширован'};
+  },
+  ratelimit: async (fn) => {
+    const allow = fn(2);
+    if (typeof allow !== 'function') return {ok:false, msg:'rateLimiter должна возвращать функцию'};
+    const r = [allow(), allow(), allow(), allow()];
+    const expct = [true, true, false, false];
+    if (JSON.stringify(r) !== JSON.stringify(expct)) return {ok:false, msg:`получено [${r}], ожидалось [${expct}]`};
+    return {ok:true, msg:'первые 2 вызова разрешены, дальше — отказ'};
+  },
+  classServer: async (Cls) => {
+    const s = new Cls('web-01', '10.0.0.5');
+    if (s.name !== 'web-01' || s.ip !== '10.0.0.5') return {ok:false, msg:'конструктор должен сохранять name и ip в this'};
+    if (typeof s.info !== 'function') return {ok:false, msg:'нет метода info()'};
+    const r = s.info();
+    if (r !== 'web-01 @ 10.0.0.5') return {ok:false, msg:`info() вернул '${r}', ожидалось 'web-01 @ 10.0.0.5'`};
+    return {ok:true, msg:'класс работает'};
+  },
+  classStack: async (Cls) => {
+    const s = new Cls();
+    s.push(1); s.push(2); s.push(3);
+    if (s.size() !== 3) return {ok:false, msg:'после трёх push size() должен быть 3'};
+    if (s.pop() !== 3) return {ok:false, msg:'pop() должен вернуть последний добавленный элемент (3)'};
+    if (s.size() !== 2) return {ok:false, msg:'после pop размер должен уменьшиться'};
+    return {ok:true, msg:'push/pop/size работают'};
+  },
+  classDisk: async (Cls) => {
+    const d = new Cls(500, 400);
+    const desc = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(d), 'freePercent');
+    if (!desc || typeof desc.get !== 'function') return {ok:false, msg:'freePercent должен быть геттером (get), а не методом'};
+    if (d.freePercent !== 20) return {ok:false, msg:`Disk(500,400).freePercent = ${d.freePercent}, ожидалось 20`};
+    const d2 = new Cls(100, 33);
+    if (d2.freePercent !== 67) return {ok:false, msg:`Disk(100,33).freePercent = ${d2.freePercent}, ожидалось 67`};
+    return {ok:true, msg:'геттер считает верно'};
+  },
+  delay: async (fn) => {
+    const p = fn(50);
+    if (!(p instanceof Promise)) return {ok:false, msg:'delay должна возвращать Promise'};
+    const t0 = Date.now();
+    const r = await p;
+    const dt = Date.now() - t0;
+    if (r !== 'done') return {ok:false, msg:`промис resolve-нулся со значением '${r}', ожидалось 'done'`};
+    if (dt < 40) return {ok:false, msg:'промис выполнился слишком быстро — setTimeout не используется?'};
+    return {ok:true, msg:`resolve('done') через ~${dt}мс`};
+  },
+  runAll: async (fn) => {
+    const r = await fn([async () => 1, async () => 2, async () => 3]);
+    if (JSON.stringify(r) !== '[1,2,3]') return {ok:false, msg:`получено ${JSON.stringify(r)}, ожидалось [1,2,3]`};
+    // проверка параллельности
+    const t0 = Date.now();
+    const slow = ms => () => new Promise(res => setTimeout(() => res(ms), ms));
+    await fn([slow(60), slow(60), slow(60)]);
+    const dt = Date.now() - t0;
+    if (dt > 140) return {ok:false, msg:`три задачи по 60мс заняли ${dt}мс — похоже, они идут последовательно, а не через Promise.all`};
+    return {ok:true, msg:`результаты в порядке, задачи параллельны (~${dt}мс)`};
+  },
+  retry: async (fn) => {
+    let n = 0;
+    const flaky = async () => { n++; if (n < 3) throw new Error('fail'); return 'ok'; };
+    const r = await fn(flaky, 3);
+    if (r !== 'ok') return {ok:false, msg:`ожидалось 'ok' после ретраев, получено '${r}'`};
+    if (n !== 3) return {ok:false, msg:`fn вызвана ${n} раз(а), ожидалось 3`};
+    n = 0;
+    let threw = false;
+    try { await fn(flaky, 2); } catch { threw = true; }
+    if (!threw) return {ok:false, msg:'при исчерпании попыток должна пробрасываться ошибка'};
+    if (n !== 2) return {ok:false, msg:`при attempts=2 fn вызвана ${n} раз(а), ожидалось 2`};
+    return {ok:true, msg:'ретраи и проброс ошибки работают'};
+  },
+  health: async (fn) => {
+    const services = [
+      {name:'api', check: async () => true},
+      {name:'db',  check: async () => false},
+      {name:'mq',  check: async () => { throw new Error('down'); }},
+      {name:'cache', check: async () => true}
+    ];
+    const r = await fn(services);
+    if (JSON.stringify(r) !== JSON.stringify(['api','cache'])) return {ok:false, msg:`получено ${JSON.stringify(r)}, ожидалось ["api","cache"]`};
+    return {ok:true, msg:'здоровые найдены, reject обработан как нездоровый'};
+  },
+  thisHello: async (fn) => {
+    const s = fn('web-01');
+    if (s.name !== 'web-01') return {ok:false, msg:'у объекта должно быть свойство name'};
+    if (typeof s.hello !== 'function') return {ok:false, msg:'нет метода hello()'};
+    if (s.hello() !== 'I am web-01') return {ok:false, msg:`hello() вернул '${s.hello()}', ожидалось 'I am web-01'`};
+    const s2 = fn('db-01');
+    if (s2.hello() !== 'I am db-01') return {ok:false, msg:'метод должен использовать this.name, а не захваченную переменную конкретного имени'};
+    return {ok:true, msg:'this работает'};
+  },
+  counterObj: async (fn) => {
+    const c = fn();
+    if (c.count !== 0) return {ok:false, msg:'count должен начинаться с 0'};
+    if (c.inc() !== 1) return {ok:false, msg:'первый inc() должен вернуть 1'};
+    if (c.inc() !== 2) return {ok:false, msg:'второй inc() должен вернуть 2'};
+    if (c.count !== 2) return {ok:false, msg:'this.count должен обновляться'};
+    return {ok:true, msg:'счётчик-объект работает'};
+  },
+  freqMap: async (fn) => {
+    const r = fn(['error','ok','error','warn','error']);
+    if (!(r instanceof Map)) return {ok:false, msg:'результат должен быть Map, а не обычным объектом'};
+    if (r.get('error') !== 3) return {ok:false, msg:`map.get('error') = ${r.get('error')}, ожидалось 3`};
+    if (r.get('ok') !== 1 || r.get('warn') !== 1) return {ok:false, msg:'неверные счётчики для ok/warn'};
+    if (r.size !== 3) return {ok:false, msg:`size = ${r.size}, ожидалось 3`};
+    return {ok:true, msg:'частоты посчитаны верно'};
+  },
+  classWeb: async (Cls) => {
+    const w = new Cls('web-01', '10.0.0.5', 'nginx');
+    if (w.name !== 'web-01' || w.ip !== '10.0.0.5') return {ok:false, msg:'super(name, ip) не вызван — родительские поля не установлены'};
+    if (w.engine !== 'nginx') return {ok:false, msg:'engine не сохранён'};
+    const r = w.info();
+    if (r !== 'web-01 @ 10.0.0.5 [nginx]') return {ok:false, msg:`info() вернул '${r}', ожидалось 'web-01 @ 10.0.0.5 [nginx]'`};
+    if (Object.getPrototypeOf(Object.getPrototypeOf(Cls.prototype)) === null && Object.getPrototypeOf(Cls.prototype) === Object.prototype) return {ok:false, msg:'WebServer должен наследовать Server через extends'};
+    return {ok:true, msg:'extends + super работают'};
+  },
+  classStatic: async (Cls) => {
+    if (typeof Cls.fromFahrenheit !== 'function') return {ok:false, msg:'fromFahrenheit должен быть статическим методом (на классе, не на экземпляре)'};
+    const t = Cls.fromFahrenheit(212);
+    if (!(t instanceof Cls)) return {ok:false, msg:'фабрика должна возвращать экземпляр Temperature'};
+    if (Math.abs(t.celsius - 100) > 0.001) return {ok:false, msg:`fromFahrenheit(212).celsius = ${t.celsius}, ожидалось 100`};
+    const t2 = Cls.fromFahrenheit(32);
+    if (Math.abs(t2.celsius) > 0.001) return {ok:false, msg:`fromFahrenheit(32).celsius = ${t2.celsius}, ожидалось 0`};
+    return {ok:true, msg:'static-фабрика работает'};
+  },
+  classPrivate: async (Cls) => {
+    const c = new Cls();
+    c.inc(); c.inc();
+    if (c.value !== 2) return {ok:false, msg:`value = ${c.value}, ожидалось 2 после двух inc()`};
+    if (c.count !== undefined) return {ok:false, msg:'поле count видно снаружи — оно должно быть приватным (#count)'};
+    if (Object.keys(c).length !== 0) return {ok:false, msg:'у экземпляра видны публичные поля: ' + Object.keys(c).join(', ') + ' — состояние должно быть в #приватном поле'};
+    return {ok:true, msg:'приватность соблюдена, геттер работает'};
+  },
+  classError: async (Cls) => {
+    const e = new Cls('port missing');
+    if (!(e instanceof Error)) return {ok:false, msg:'ConfigError должен наследовать Error'};
+    if (e.message !== 'port missing') return {ok:false, msg:`message = '${e.message}' — передай его в super(message)`};
+    if (e.name !== 'ConfigError') return {ok:false, msg:`name = '${e.name}', ожидалось 'ConfigError'`};
+    return {ok:true, msg:'кастомная ошибка настроена верно'};
+  },
+  validate: async (fn) => {
+    if (fn(8080) !== 8080) return {ok:false, msg:'валидный порт 8080 должен вернуться как есть'};
+    if (fn(1) !== 1 || fn(65535) !== 65535) return {ok:false, msg:'границы 1 и 65535 — валидные'};
+    for (const bad of [0, 70000, -5, 3.14, '80']) {
+      let threw = false;
+      try { fn(bad); } catch { threw = true; }
+      if (!threw) return {ok:false, msg:`validatePort(${JSON.stringify(bad)}) должен бросить исключение`};
+    }
+    return {ok:true, msg:'валидные проходят, невалидные бросают throw'};
+  },
+  safeRun: async (fn) => {
+    const r1 = fn(() => 42);
+    if (!r1 || r1.ok !== true || r1.value !== 42) return {ok:false, msg:`при успехе ожидалось {ok:true, value:42}, получено ${JSON.stringify(r1)}`};
+    const r2 = fn(() => { throw new Error('boom'); });
+    if (!r2 || r2.ok !== false || r2.error !== 'boom') return {ok:false, msg:`при ошибке ожидалось {ok:false, error:'boom'}, получено ${JSON.stringify(r2)}`};
+    return {ok:true, msg:'Result-паттерн работает'};
+  },
+  delayCall: async (fn) => {
+    const t0 = Date.now();
+    const r = await fn(() => 'pong', 50);
+    const dt = Date.now() - t0;
+    if (r !== 'pong') return {ok:false, msg:`ожидалось 'pong', получено '${r}'`};
+    if (dt < 40) return {ok:false, msg:'выполнилось слишком быстро — setTimeout не используется?'};
+    return {ok:true, msg:`fn вызвана через ~${dt}мс, результат проброшен`};
+  },
+  cancellable: async (fn) => {
+    let fired = false;
+    const cancel = fn(() => { fired = true; }, 50);
+    if (typeof cancel !== 'function') return {ok:false, msg:'cancellable должна возвращать функцию отмены'};
+    cancel();
+    await new Promise(r => setTimeout(r, 100));
+    if (fired) return {ok:false, msg:'fn выполнилась несмотря на отмену — clearTimeout не сработал'};
+    let fired2 = false;
+    fn(() => { fired2 = true; }, 30);
+    await new Promise(r => setTimeout(r, 80));
+    if (!fired2) return {ok:false, msg:'без отмены fn должна выполниться'};
+    return {ok:true, msg:'отмена работает, без отмены fn выполняется'};
+  },
+  debounce: async (fn) => {
+    let calls = 0, lastArg = null;
+    const d = fn((x) => { calls++; lastArg = x; }, 60);
+    if (typeof d !== 'function') return {ok:false, msg:'debounce должна возвращать функцию'};
+    d('a'); d('b'); d('c');
+    if (calls !== 0) return {ok:false, msg:'fn вызвалась сразу — она должна ждать паузы'};
+    await new Promise(r => setTimeout(r, 120));
+    if (calls !== 1) return {ok:false, msg:`после паузы fn вызвана ${calls} раз(а), ожидалось 1 (серия схлопывается)`};
+    if (lastArg !== 'c') return {ok:false, msg:`fn получила '${lastArg}', ожидались аргументы последнего вызова ('c')`};
+    return {ok:true, msg:'серия из 3 вызовов схлопнулась в 1, аргументы последнего'};
+  },
+  countCalls: async (fn) => {
+    const w = fn(x => x * 2);
+    if (w.calls !== 0) return {ok:false, msg:'calls должен начинаться с 0'};
+    if (w(5) !== 10) return {ok:false, msg:'обёртка должна возвращать результат fn'};
+    w(7);
+    if (w.calls !== 2) return {ok:false, msg:`calls = ${w.calls}, ожидалось 2`};
+    return {ok:true, msg:'вызовы посчитаны, результат проброшен'};
+  },
+  memoize: async (fn) => {
+    let realCalls = 0;
+    const m = fn((x) => { realCalls++; return x * 10; });
+    if (m(4) !== 40) return {ok:false, msg:'обёртка должна возвращать результат fn'};
+    if (m(4) !== 40 || m(4) !== 40) return {ok:false, msg:'повторный вызов должен отдавать то же значение'};
+    if (realCalls !== 1) return {ok:false, msg:`fn реально вызвана ${realCalls} раз(а) для одинаковых аргументов, ожидалось 1 — кэш не работает`};
+    if (m(5) !== 50) return {ok:false, msg:'другой аргумент — другой результат'};
+    if (realCalls !== 2) return {ok:false, msg:'для нового аргумента fn должна вызваться'};
+    return {ok:true, msg:'кэширование работает'};
+  },
+  fixContext: async (fn) => {
+    const server = { name: 'web-01', getName() { return this.name; } };
+    const f = fn(server, 'getName');
+    if (typeof f !== 'function') return {ok:false, msg:'должна вернуться функция'};
+    const detached = f;
+    if (detached() !== 'web-01') return {ok:false, msg:'this потерялся — используй bind'};
+    return {ok:true, msg:'this привязан намертво'};
+  },
+  settled: async (fn) => {
+    const r = await fn([
+      Promise.resolve(1),
+      Promise.reject(new Error('x')),
+      Promise.resolve(2),
+      Promise.reject(new Error('y'))
+    ]);
+    if (!r || r.fulfilled !== 2 || r.rejected !== 2) return {ok:false, msg:`получено ${JSON.stringify(r)}, ожидалось {fulfilled:2, rejected:2}`};
+    return {ok:true, msg:'allSettled дождался всех и посчитал верно'};
+  },
+  withTimeout: async (fn) => {
+    const fast = new Promise(res => setTimeout(() => res('ok'), 20));
+    const r = await fn(fast, 200);
+    if (r !== 'ok') return {ok:false, msg:`быстрый промис должен вернуть свой результат, получено '${r}'`};
+    const slow = new Promise(res => setTimeout(() => res('late'), 500));
+    let threw = false, msg = '';
+    try { await fn(slow, 30); } catch (e) { threw = true; msg = e.message; }
+    if (!threw) return {ok:false, msg:'медленный промис должен упасть по таймауту'};
+    if (!msg.includes('timeout')) return {ok:false, msg:`ошибка таймаута должна содержать 'timeout', получено '${msg}'`};
+    return {ok:true, msg:'быстрый проходит, медленный падает по таймауту'};
+  },
+  sequential: async (fn) => {
+    const order = [];
+    const mk = (name, ms) => async () => {
+      order.push(name + ':start');
+      await new Promise(r => setTimeout(r, ms));
+      order.push(name + ':end');
+      return name;
+    };
+    const t0 = Date.now();
+    const r = await fn([mk('a', 40), mk('b', 40), mk('c', 40)]);
+    const dt = Date.now() - t0;
+    if (JSON.stringify(r) !== JSON.stringify(['a','b','c'])) return {ok:false, msg:`результаты ${JSON.stringify(r)}, ожидалось ['a','b','c']`};
+    if (order[1] !== 'a:end' || order[2] !== 'b:start') return {ok:false, msg:'задачи пересеклись — b стартовала до завершения a. Нужен await в цикле, а не Promise.all'};
+    if (dt < 100) return {ok:false, msg:`три задачи по 40мс заняли ${dt}мс — они идут параллельно, а должны по очереди`};
+    return {ok:true, msg:`строго по очереди, суммарно ~${dt}мс`};
+  },
+  genRange: async (fn) => {
+    const g = fn(1, 4);
+    if (!g || typeof g.next !== 'function') return {ok:false, msg:'range должен быть генератором (function*) — вызов возвращает итератор'};
+    const arr = [...fn(1, 4)];
+    if (JSON.stringify(arr) !== '[1,2,3,4]') return {ok:false, msg:`[...range(1,4)] = ${JSON.stringify(arr)}, ожидалось [1,2,3,4]`};
+    const arr2 = [...fn(5, 5)];
+    if (JSON.stringify(arr2) !== '[5]') return {ok:false, msg:'range(5,5) должен выдать [5]'};
+    return {ok:true, msg:'генератор выдаёт диапазон включительно'};
+  },
+  takeN: async (fn) => {
+    function* infinite() { let i = 1; while (true) yield i * 100, i++; }
+    const r = fn(infinite(), 3);
+    if (JSON.stringify(r) !== '[100,200,300]') return {ok:false, msg:`из бесконечного генератора взято ${JSON.stringify(r)}, ожидалось [100,200,300]`};
+    const r2 = fn([10, 20, 30, 40], 2);
+    if (JSON.stringify(r2) !== '[10,20]') return {ok:false, msg:`take([10,20,30,40], 2) = ${JSON.stringify(r2)}, ожидалось [10,20]`};
+    return {ok:true, msg:'работает даже с бесконечным источником — ленивость в деле'};
+  },
+  idGen: async (fn) => {
+    const g = fn();
+    if (!g || typeof g.next !== 'function') return {ok:false, msg:'idGenerator должен быть генератором (function*)'};
+    const a = g.next().value, b = g.next().value, c = g.next().value;
+    if (a !== 1 || b !== 2 || c !== 3) return {ok:false, msg:`первые три значения: ${a}, ${b}, ${c} — ожидалось 1, 2, 3`};
+    const g2 = fn();
+    if (g2.next().value !== 1) return {ok:false, msg:'новый генератор должен начинать заново с 1'};
+    return {ok:true, msg:'бесконечный генератор id работает'};
+  }
+};
+
+/* =========================================================
+   ДВИЖОК
+   ========================================================= */
+const state = { passed: new Set(), current: 0 };
+const TOTAL = MODULES.reduce((a, m) => a + m.tasks.length, 0);
+
+function deepEq(a, b) {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (a === null || b === null) return false;
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b) || a.length !== b.length) return false;
+    return a.every((v, i) => deepEq(v, b[i]));
+  }
+  if (typeof a === 'object') {
+    const ka = Object.keys(a), kb = Object.keys(b);
+    if (ka.length !== kb.length) return false;
+    return ka.every(k => deepEq(a[k], b[k]));
+  }
+  return false;
+}
+function cloneArgs(args) {
+  try { return structuredClone(args); } catch { return args; }
+}
+function fmt(v) {
+  if (v === undefined) return 'undefined';
+  try { return JSON.stringify(v); } catch { return String(v); }
+}
+
+async function runTask(mod, task) {
+  const editor = document.getElementById('ed-' + task.id);
+  const out = document.getElementById('out-' + task.id);
+  const dot = document.getElementById('dot-' + task.id);
+  out.classList.add('show');
+  out.innerHTML = '<span class="t-log">$ running tests…</span>';
+
+  const logs = [];
+  const fakeConsole = { log: (...a) => logs.push(a.map(fmt).join(' ')), error: (...a) => logs.push(a.map(fmt).join(' ')), warn: (...a) => logs.push(a.map(fmt).join(' ')) };
+
+  let target;
+  try {
+    const factory = new Function('console', editor.value + '\n;return typeof ' + task.fname + " !== 'undefined' ? " + task.fname + ' : undefined;');
+    target = factory(fakeConsole);
+  } catch (e) {
+    out.innerHTML = '<span class="t-err">✗ синтаксическая ошибка:\n  ' + esc(e.message) + '</span>';
+    dot.className = 'task-status fail';
+    return;
+  }
+  if (target === undefined) {
+    out.innerHTML = '<span class="t-err">✗ не найдена функция/класс с именем ' + task.fname + '</span>';
+    dot.className = 'task-status fail';
+    return;
+  }
+
+  const lines = [];
+  let allPass = true;
+
+  const timeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('таймаут ' + ms + 'мс — возможно, бесконечный цикл или промис никогда не резолвится')), ms))]);
+
+  for (const t of task.tests) {
+    try {
+      if (t.custom) {
+        const res = await timeout(CUSTOM_TESTS[t.custom](target), 3000);
+        if (res.ok) lines.push('<span class="t-pass">✓ ' + esc(res.msg) + '</span>');
+        else { lines.push('<span class="t-fail">✗ ' + esc(res.msg) + '</span>'); allPass = false; }
+      } else {
+        let got = target(...cloneArgs(t.args));
+        if (got instanceof Promise) got = await timeout(got, 3000);
+        const argStr = t.args.map(fmt).join(', ');
+        if (deepEq(got, t.exp)) {
+          lines.push('<span class="t-pass">✓ ' + esc(task.fname + '(' + argStr + ') → ' + fmt(got)) + '</span>');
+        } else {
+          lines.push('<span class="t-fail">✗ ' + esc(task.fname + '(' + argStr + ')') + '\n  <span class="t-log">ожидалось:</span> ' + esc(fmt(t.exp)) + '\n  <span class="t-log">получено: </span> ' + esc(fmt(got)) + '</span>');
+          allPass = false;
+        }
+      }
+    } catch (e) {
+      lines.push('<span class="t-fail">✗ исключение: ' + esc(e.message) + '</span>');
+      allPass = false;
+    }
+  }
+
+  if (logs.length) lines.push('<span class="t-log">— console —\n' + esc(logs.join('\n')) + '</span>');
+  lines.push(allPass
+    ? '<span class="t-pass">\n▸ PASSED — задача засчитана</span>'
+    : '<span class="t-sum">\n▸ FAILED — поправь и запусти снова</span>');
+  out.innerHTML = lines.join('\n');
+  dot.className = 'task-status ' + (allPass ? 'pass' : 'fail');
+
+  if (allPass) state.passed.add(task.id); 
+  refreshProgress();
+}
+
+function refreshProgress() {
+  const n = state.passed.size;
+  document.getElementById('prog-text').textContent = n + '/' + TOTAL;
+  document.getElementById('prog-fill').style.width = (n / TOTAL * 100) + '%';
+  MODULES.forEach((m, i) => {
+    const done = m.tasks.filter(t => state.passed.has(t.id)).length;
+    const el = document.getElementById('navchk-' + i);
+    if (done === m.tasks.length) { el.textContent = '✓'; el.className = 'nav-check done'; }
+    else if (done > 0) { el.textContent = done + '/' + m.tasks.length; el.className = 'nav-check part'; }
+    else { el.textContent = '·'; el.className = 'nav-check'; }
+  });
+  const fin = document.getElementById('finish');
+  if (fin) fin.classList.toggle('show', n === TOTAL);
+}
+
+/* ---------- рендер ---------- */
+const editorsCache = {}; // сохраняем код при переключении модулей
+
+function renderNav() {
+  const nav = document.getElementById('nav');
+  nav.innerHTML = MODULES.map((m, i) =>
+    `<div class="nav-item ${i === state.current ? 'active' : ''}" onclick="goTo(${i})">
+      <span class="nav-num">${String(i+1).padStart(2,'0')}</span>
+      <span>${m.title}</span>
+      <span class="nav-check" id="navchk-${i}">·</span>
+    </div>`).join('');
+}
+
+function renderModule() {
+  const m = MODULES[state.current];
+  const main = document.getElementById('main');
+  const links = m.links.map(([t, u]) => `<a class="ext-link" href="${u}" target="_blank" rel="noopener">${t} ↗</a>`).join(' · ');
+
+  main.innerHTML = `
+    <div class="module-eyebrow">$ module <b>${String(state.current+1).padStart(2,'0')}/${MODULES.length}</b></div>
+    <h1>${m.title}</h1>
+    <p class="module-desc">${m.desc}</p>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--overlay)">javascript.info: ${links}</div>
+    <div class="theory">${m.theory}</div>
+    ${m.tasks.map(t => `
+    <div class="task">
+      <div class="task-head">
+        <div class="task-status ${state.passed.has(t.id) ? 'pass' : ''}" id="dot-${t.id}"></div>
+        <div class="task-title">${t.title}</div>
+        <div class="task-tag">${t.tag}</div>
+      </div>
+      <div class="task-body">
+        <div class="task-desc">${t.desc}</div>
+        <textarea class="editor" id="ed-${t.id}" spellcheck="false">${esc(editorsCache[t.id] ?? t.starter)}</textarea>
+        <div class="task-actions">
+          <button class="btn-run" onclick="runTaskById('${t.id}')">▸ Запустить тесты</button>
+          <button class="btn-ghost" onclick="toggle('hint-${t.id}')">Подсказка</button>
+          <button class="btn-ghost" onclick="toggle('sol-${t.id}')">Решение</button>
+        </div>
+        <div class="hintbox" id="hint-${t.id}">💡 ${t.hint}</div>
+        <div class="solbox" id="sol-${t.id}"><pre><code>${esc(t.solution)}</code></pre></div>
+        <div class="output" id="out-${t.id}"></div>
+      </div>
+    </div>`).join('')}
+    <div class="module-nav">
+      <button class="btn-ghost" onclick="goTo(${state.current-1})" ${state.current === 0 ? 'disabled style="opacity:.3"' : ''}>← ${state.current > 0 ? MODULES[state.current-1].title : ''}</button>
+      <button class="btn-ghost" onclick="goTo(${state.current+1})" ${state.current === MODULES.length-1 ? 'disabled style="opacity:.3"' : ''}>${state.current < MODULES.length-1 ? MODULES[state.current+1].title : ''} →</button>
+    </div>
+    ${state.current === MODULES.length - 1 ? '<div class="finish" id="finish"><h2>▸ ' + TOTAL + '/' + TOTAL + ' — pipeline green</h2><p>Все задачи решены. Дальше: перепиши random-name-picker-bot с Go на Node.js — язык новый, а AWS и CI/CD уже твои.</p></div>' : ''}
+  `;
+
+  // сохранять код при вводе + tab в редакторах
+  m.tasks.forEach(t => {
+    const ed = document.getElementById('ed-' + t.id);
+    ed.addEventListener('input', () => { editorsCache[t.id] = ed.value; });
+    ed.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = ed.selectionStart;
+        ed.value = ed.value.slice(0, s) + '  ' + ed.value.slice(ed.selectionEnd);
+        ed.selectionStart = ed.selectionEnd = s + 2;
+        editorsCache[t.id] = ed.value;
+      }
+    });
+  });
+  refreshProgress();
+}
+
+function runTaskById(id) {
+  for (const m of MODULES) {
+    const t = m.tasks.find(t => t.id === id);
+    if (t) { runTask(m, t); return; }
+  }
+}
+function toggle(id) { document.getElementById(id).classList.toggle('show'); }
+function goTo(i) {
+  if (i < 0 || i >= MODULES.length) return;
+  state.current = i;
+  renderNav(); renderModule();
+  window.scrollTo({top: 0});
+}
+
+renderNav();
+renderModule();
+</script>
+</body>
+</html>
