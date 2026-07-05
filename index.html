@@ -297,7 +297,83 @@ sumRange(3, 3)  → 3</span>`,
   {
     id:'m3t2', title:'fizzbuzz()', tag:'классика',
     desc:`Функция <code>fizzbuzz(n)</code> возвращает <b>массив</b> от 1 до n, где кратные 3 заменены на <code>'Fizz'</code>, кратные 5 — на <code>'Buzz'</code>, кратные 15 — на <code>'FizzBuzz'</code>. Самая известная задача собеседований в истории.<span class="io">fizzbuzz(5) → [1, 2, 'Fizz', 4, 'Buzz']</span>`,
-    starter:"function fizzbuzz(n) {\n  const result = [];\n  // ...\n  return result;\n}",
+    starter:"function fizzbuzz(n) {\n  const result = [
+,
+{
+  id:'m12',
+  title:'DOM и события',
+  desc:'Работа с реальным UI: элементы, события, формы, делегирование.',
+  links:[
+    ['DOM navigation','https://javascript.info/dom-nodes'],
+    ['Events','https://javascript.info/introduction-browser-events']
+  ],
+  theory:`<h3>// теория</h3>
+<p>DOM — это объектное представление HTML. Через него JS управляет страницей.</p>
+<pre><code>
+const btn = document.querySelector('.btn');
+btn.addEventListener('click', () => {
+  console.log('clicked');
+});
+</code></pre>
+<p>Основное:</p>
+<ul>
+<li><code>querySelector()</code></li>
+<li><code>textContent</code></li>
+<li><code>classList.toggle()</code></li>
+<li><code>addEventListener()</code></li>
+</ul>`,
+  tasks:[
+    {
+      id:'m12t1',
+      title:'changeText()',
+      tag:'DOM',
+      desc:`Измени текст элемента по селектору.`,
+      starter:`function changeText(selector, text) {
+  // твой код
+}`,
+      fname:'changeText',
+      tests:[{custom:'domChangeText'}],
+      hint:'querySelector + textContent',
+      solution:`function changeText(selector, text) {
+  const el = document.querySelector(selector);
+  el.textContent = text;
+}`
+    },
+    {
+      id:'m12t2',
+      title:'toggleActive()',
+      tag:'classList',
+      desc:`Переключи active класс.`,
+      starter:`function toggleActive(selector) {
+  // твой код
+}`,
+      fname:'toggleActive',
+      tests:[{custom:'domToggle'}],
+      hint:'classList.toggle',
+      solution:`function toggleActive(selector) {
+  const el = document.querySelector(selector);
+  el.classList.toggle('active');
+}`
+    },
+    {
+      id:'m12t3',
+      title:'bindClick()',
+      tag:'events',
+      desc:`Навесь click handler.`,
+      starter:`function bindClick(selector, cb) {
+  // твой код
+}`,
+      fname:'bindClick',
+      tests:[{custom:'domClick'}],
+      hint:'addEventListener',
+      solution:`function bindClick(selector, cb) {
+  const el = document.querySelector(selector);
+  el.addEventListener('click', cb);
+}`
+    }
+  ]
+}
+];\n  // ...\n  return result;\n}",
     fname:'fizzbuzz',
     tests:[
       {args:[5],exp:[1,2,'Fizz',4,'Buzz']},
