@@ -32,6 +32,9 @@ body{background:var(--crust);color:var(--text);font-family:var(--sans);font-size
 .progress-label{font-family:var(--mono);font-size:11px;color:var(--subtext);display:flex;justify-content:space-between;margin-bottom:6px}
 .progress-bar{height:6px;background:var(--surface0);border-radius:3px;overflow:hidden}
 .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--mauve),var(--green));border-radius:3px;transition:width .4s}
+.progress-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.progress-btn{font-family:var(--mono);font-size:10.5px;background:var(--surface0);color:var(--subtext);border:1px solid var(--surface1);border-radius:6px;padding:5px 7px;cursor:pointer}
+.progress-btn:hover{color:var(--text);border-color:var(--mauve)}
 .nav{padding:10px 8px}
 .nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;cursor:pointer;font-family:var(--mono);font-size:12.5px;color:var(--subtext);transition:background .15s,color .15s}
 .nav-item:hover{background:var(--surface0);color:var(--text)}
@@ -122,6 +125,12 @@ button:active{transform:scale(.97)}
     <div class="progress-wrap">
       <div class="progress-label"><span>прогресс</span><span id="prog-text">0/30</span></div>
       <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+      <div class="progress-actions">
+        <button class="progress-btn" onclick="exportProgress()">export</button>
+        <button class="progress-btn" onclick="document.getElementById('import-progress').click()">import</button>
+        <button class="progress-btn" onclick="resetProgress()">reset</button>
+        <input id="import-progress" type="file" accept="application/json" style="display:none" onchange="importProgress(event)">
+      </div>
     </div>
     <nav class="nav" id="nav"></nav>
   </aside>
@@ -1225,9 +1234,9 @@ ids.next().value → 2
 }
 
 ,
-/* ---------- 12 ---------- */
+/* ---------- 20 ---------- */
 {
-  id:'m12', title:'DOM и события',
+  id:'m20', title:'DOM и события',
   desc:'Работа с реальным UI: поиск элементов, изменение текста, классы и обработчики событий.',
   links:[['DOM navigation','https://javascript.info/dom-nodes'],['Events','https://javascript.info/introduction-browser-events'],['Element methods','https://javascript.info/searching-elements-dom']],
   theory:`<h3>// теория</h3>
@@ -1245,7 +1254,7 @@ btn.<span class="c-fn">addEventListener</span>(<span class="c-str">'click'</span
 </ul>`,
   tasks:[
   {
-    id:'m12t1', title:'changeText()', tag:'DOM',
+    id:'m20t1', title:'changeText()', tag:'DOM',
     desc:`Функция <code>changeText(selector, text)</code> находит элемент по селектору и меняет его текст на <code>text</code>.<span class="io">HTML: &lt;div id="status"&gt;old&lt;/div&gt;
 changeText('#status', 'ready')
 текст элемента → 'ready'</span>`,
@@ -1256,7 +1265,7 @@ changeText('#status', 'ready')
     solution:"function changeText(selector, text) {\n  const el = document.querySelector(selector);\n  el.textContent = text;\n}"
   },
   {
-    id:'m12t2', title:'toggleActive()', tag:'classList',
+    id:'m20t2', title:'toggleActive()', tag:'classList',
     desc:`Функция <code>toggleActive(selector)</code> переключает класс <code>active</code> у найденного элемента.<span class="io">если active нет → добавить
 если active есть → убрать</span>`,
     starter:"function toggleActive(selector) {\n  // classList.toggle\n}",
@@ -1266,7 +1275,7 @@ changeText('#status', 'ready')
     solution:"function toggleActive(selector) {\n  const el = document.querySelector(selector);\n  el.classList.toggle('active');\n}"
   },
   {
-    id:'m12t3', title:'bindClick()', tag:'events',
+    id:'m20t3', title:'bindClick()', tag:'events',
     desc:`Функция <code>bindClick(selector, cb)</code> находит элемент и навешивает на него обработчик клика <code>cb</code>.<span class="io">bindClick('#btn', () =&gt; calls++)
 click по кнопке → calls увеличился</span>`,
     starter:"function bindClick(selector, cb) {\n  // addEventListener\n}",
@@ -1276,6 +1285,84 @@ click по кнопке → calls увеличился</span>`,
     solution:"function bindClick(selector, cb) {\n  const el = document.querySelector(selector);\n  el.addEventListener('click', cb);\n}"
   }]
 }
+,
+/* ---------- 21 ---------- */
+{
+  id:'m21',
+  title:'Fetch, API и JSON',
+  desc:'Практика реального фронта: запросы к API, обработка HTTP-статусов, JSON и POST-запросы.',
+  links:[
+    ['Fetch','https://javascript.info/fetch'],
+    ['Fetch: POST','https://javascript.info/fetch#post-requests'],
+    ['Promise API','https://javascript.info/promise-api']
+  ],
+  theory:`<h3>// теория</h3>
+<p><code>fetch()</code> — стандартный способ делать HTTP-запросы из браузера. Он возвращает <code>Promise</code>, поэтому почти всегда используется вместе с <code>async/await</code>.</p>
+<pre><code><span class="c-kw">async function</span> <span class="c-fn">loadUser</span>() {
+  <span class="c-kw">const</span> res = <span class="c-kw">await</span> <span class="c-fn">fetch</span>(<span class="c-str">'/api/user'</span>);
+  <span class="c-kw">if</span> (!res.ok) {
+    <span class="c-kw">throw new</span> <span class="c-fn">Error</span>(<span class="c-str">'HTTP '</span> + res.status);
+  }
+  <span class="c-kw">return await</span> res.<span class="c-fn">json</span>();
+}</code></pre>
+<p>Важный момент: <code>fetch</code> сам не считает HTTP 404/500 ошибкой. Ошибка будет только при сетевой проблеме. Поэтому <code>res.ok</code> надо проверять руками.</p>
+<ul>
+<li><code>GET</code> — забрать данные</li>
+<li><code>POST</code> — отправить данные</li>
+<li><code>URLSearchParams</code> — собрать query string</li>
+<li><code>JSON.stringify()</code> — объект в JSON-строку</li>
+<li><code>res.json()</code> — тело ответа в объект</li>
+</ul>`,
+  tasks:[
+    {
+      id:'m21t1',
+      title:'buildApiUrl()',
+      tag:'query string',
+      desc:`Функция <code>buildApiUrl(base, params)</code> собирает URL с query-параметрами. Если параметров нет — верни просто <code>base</code>.<span class="io">buildApiUrl('/api/users', {page: 2, limit: 10})
+→ '/api/users?page=2&limit=10'
+
+buildApiUrl('/api/users', {})
+→ '/api/users'</span>`,
+      starter:"function buildApiUrl(base, params) {\n  // URLSearchParams\n}",
+      fname:'buildApiUrl',
+      tests:[
+        {args:['/api/users', {page:2, limit:10}], exp:'/api/users?page=2&limit=10'},
+        {args:['/api/search', {q:'js', sort:'new'}], exp:'/api/search?q=js&sort=new'},
+        {args:['/api/users', {}], exp:'/api/users'}
+      ],
+      hint:'const qs = new URLSearchParams(params).toString(); Если qs пустой — возвращай base.',
+      solution:"function buildApiUrl(base, params) {\n  const qs = new URLSearchParams(params).toString();\n  return qs ? base + '?' + qs : base;\n}"
+    },
+    {
+      id:'m21t2',
+      title:'fetchJson()',
+      tag:'GET + errors',
+      desc:`Функция <code>fetchJson(url)</code> делает GET-запрос, проверяет <code>response.ok</code> и возвращает распарсенный JSON. Если HTTP-статус плохой — выброси ошибку <code>Error('HTTP ' + status)</code>.<span class="io">await fetchJson('/api/status')
+→ {ok: true}
+
+HTTP 500
+→ throw Error('HTTP 500')</span>`,
+      starter:"async function fetchJson(url) {\n  // fetch → проверка ok → response.json()\n}",
+      fname:'fetchJson',
+      tests:[{custom:'fetchJson'}],
+      hint:'const res = await fetch(url); if (!res.ok) throw new Error("HTTP " + res.status); return await res.json();',
+      solution:"async function fetchJson(url) {\n  const res = await fetch(url);\n  if (!res.ok) throw new Error('HTTP ' + res.status);\n  return await res.json();\n}"
+    },
+    {
+      id:'m21t3',
+      title:'postJson()',
+      tag:'POST',
+      desc:`Функция <code>postJson(url, data)</code> отправляет JSON через POST и возвращает JSON-ответ. Нужно передать <code>method</code>, <code>headers</code> и <code>body</code>.<span class="io">await postJson('/api/tasks', {title:'deploy'})
+→ {id: 7, title:'deploy'}</span>`,
+      starter:"async function postJson(url, data) {\n  // fetch(url, { method, headers, body })\n}",
+      fname:'postJson',
+      tests:[{custom:'postJson'}],
+      hint:"headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)",
+      solution:"async function postJson(url, data) {\n  const res = await fetch(url, {\n    method: 'POST',\n    headers: {'Content-Type': 'application/json'},\n    body: JSON.stringify(data)\n  });\n  if (!res.ok) throw new Error('HTTP ' + res.status);\n  return await res.json();\n}"
+    }
+  ]
+}
+
 ];
 
 /* =========================================================
@@ -1624,13 +1711,144 @@ const CUSTOM_TESTS = {
     } finally {
       btn.remove();
     }
+  },
+  fetchJson: async (fn) => {
+    const oldFetch = globalThis.fetch;
+    let calledUrl = null;
+    globalThis.fetch = async (url) => {
+      calledUrl = url;
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ok:true, service:'api'})
+      };
+    };
+    try {
+      const data = await fn('/api/status');
+      if (calledUrl !== '/api/status') return {ok:false, msg:`fetch вызван с '${calledUrl}', ожидалось '/api/status'`};
+      if (!data || data.ok !== true || data.service !== 'api') return {ok:false, msg:'нужно вернуть результат response.json()'};
+    } finally {
+      globalThis.fetch = oldFetch;
+    }
+
+    globalThis.fetch = async () => ({
+      ok: false,
+      status: 500,
+      json: async () => ({error:'down'})
+    });
+    try {
+      let threw = false;
+      try { await fn('/api/down'); } catch (e) {
+        threw = true;
+        if (!String(e.message).includes('HTTP 500')) return {ok:false, msg:`ошибка должна быть 'HTTP 500', получено '${e.message}'`};
+      }
+      if (!threw) return {ok:false, msg:'при response.ok === false функция должна выбросить ошибку'};
+      return {ok:true, msg:'GET, response.ok и json() обработаны правильно'};
+    } finally {
+      globalThis.fetch = oldFetch;
+    }
+  },
+  postJson: async (fn) => {
+    const oldFetch = globalThis.fetch;
+    let captured = null;
+    globalThis.fetch = async (url, options = {}) => {
+      captured = {url, options};
+      return {
+        ok: true,
+        status: 201,
+        json: async () => ({id:7, saved:true})
+      };
+    };
+    try {
+      const payload = {title:'deploy'};
+      const data = await fn('/api/tasks', payload);
+      if (!captured) return {ok:false, msg:'fetch не был вызван'};
+      if (captured.url !== '/api/tasks') return {ok:false, msg:`fetch вызван с '${captured.url}', ожидалось '/api/tasks'`};
+      if (captured.options.method !== 'POST') return {ok:false, msg:"method должен быть 'POST'"};
+      const h = captured.options.headers || {};
+      const ct = h['Content-Type'] || h['content-type'];
+      if (ct !== 'application/json') return {ok:false, msg:"нужен header Content-Type: application/json"};
+      if (captured.options.body !== JSON.stringify(payload)) return {ok:false, msg:'body должен быть JSON.stringify(data)'};
+      if (!data || data.id !== 7 || data.saved !== true) return {ok:false, msg:'нужно вернуть JSON-ответ сервера'};
+      return {ok:true, msg:'POST-запрос с JSON собран правильно'};
+    } finally {
+      globalThis.fetch = oldFetch;
+    }
   }
 };
 
 /* =========================================================
    ДВИЖОК
    ========================================================= */
-const state = { passed: new Set(), current: 0 };
+const STORAGE_KEY = 'js-trainer-progress-v2';
+
+function allTaskIds() {
+  return new Set(MODULES.flatMap(m => m.tasks.map(t => t.id)));
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return new Set();
+    const data = JSON.parse(raw);
+    const valid = allTaskIds();
+    const passed = Array.isArray(data.passed) ? data.passed : [];
+    return new Set(passed.filter(id => valid.has(id)));
+  } catch {
+    return new Set();
+  }
+}
+
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    version: 2,
+    updatedAt: new Date().toISOString(),
+    passed: [...state.passed]
+  }));
+}
+
+function exportProgress() {
+  const data = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    passed: [...state.passed]
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'js-trainer-progress.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function importProgress(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    const valid = allTaskIds();
+    const passed = (Array.isArray(data) ? data : data.passed || []).filter(id => valid.has(id));
+    state.passed = new Set(passed);
+    saveProgress();
+    renderNav();
+    renderModule();
+  } catch {
+    alert('Не смог импортировать прогресс: файл должен быть JSON с массивом passed.');
+  } finally {
+    event.target.value = '';
+  }
+}
+
+function resetProgress() {
+  if (!confirm('Сбросить весь прогресс?')) return;
+  state.passed.clear();
+  saveProgress();
+  renderNav();
+  renderModule();
+}
+
+const state = { passed: loadProgress(), current: 0 };
 const TOTAL = MODULES.reduce((a, m) => a + m.tasks.length, 0);
 
 function deepEq(a, b) {
@@ -1716,7 +1934,10 @@ async function runTask(mod, task) {
   out.innerHTML = lines.join('\n');
   dot.className = 'task-status ' + (allPass ? 'pass' : 'fail');
 
-  if (allPass) state.passed.add(task.id); 
+  if (allPass) {
+    state.passed.add(task.id);
+    saveProgress();
+  }
   refreshProgress();
 }
 
