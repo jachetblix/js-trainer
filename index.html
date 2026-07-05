@@ -297,83 +297,7 @@ sumRange(3, 3)  → 3</span>`,
   {
     id:'m3t2', title:'fizzbuzz()', tag:'классика',
     desc:`Функция <code>fizzbuzz(n)</code> возвращает <b>массив</b> от 1 до n, где кратные 3 заменены на <code>'Fizz'</code>, кратные 5 — на <code>'Buzz'</code>, кратные 15 — на <code>'FizzBuzz'</code>. Самая известная задача собеседований в истории.<span class="io">fizzbuzz(5) → [1, 2, 'Fizz', 4, 'Buzz']</span>`,
-    starter:"function fizzbuzz(n) {\n  const result = [
-,
-{
-  id:'m12',
-  title:'DOM и события',
-  desc:'Работа с реальным UI: элементы, события, формы, делегирование.',
-  links:[
-    ['DOM navigation','https://javascript.info/dom-nodes'],
-    ['Events','https://javascript.info/introduction-browser-events']
-  ],
-  theory:`<h3>// теория</h3>
-<p>DOM — это объектное представление HTML. Через него JS управляет страницей.</p>
-<pre><code>
-const btn = document.querySelector('.btn');
-btn.addEventListener('click', () => {
-  console.log('clicked');
-});
-</code></pre>
-<p>Основное:</p>
-<ul>
-<li><code>querySelector()</code></li>
-<li><code>textContent</code></li>
-<li><code>classList.toggle()</code></li>
-<li><code>addEventListener()</code></li>
-</ul>`,
-  tasks:[
-    {
-      id:'m12t1',
-      title:'changeText()',
-      tag:'DOM',
-      desc:`Измени текст элемента по селектору.`,
-      starter:`function changeText(selector, text) {
-  // твой код
-}`,
-      fname:'changeText',
-      tests:[{custom:'domChangeText'}],
-      hint:'querySelector + textContent',
-      solution:`function changeText(selector, text) {
-  const el = document.querySelector(selector);
-  el.textContent = text;
-}`
-    },
-    {
-      id:'m12t2',
-      title:'toggleActive()',
-      tag:'classList',
-      desc:`Переключи active класс.`,
-      starter:`function toggleActive(selector) {
-  // твой код
-}`,
-      fname:'toggleActive',
-      tests:[{custom:'domToggle'}],
-      hint:'classList.toggle',
-      solution:`function toggleActive(selector) {
-  const el = document.querySelector(selector);
-  el.classList.toggle('active');
-}`
-    },
-    {
-      id:'m12t3',
-      title:'bindClick()',
-      tag:'events',
-      desc:`Навесь click handler.`,
-      starter:`function bindClick(selector, cb) {
-  // твой код
-}`,
-      fname:'bindClick',
-      tests:[{custom:'domClick'}],
-      hint:'addEventListener',
-      solution:`function bindClick(selector, cb) {
-  const el = document.querySelector(selector);
-  el.addEventListener('click', cb);
-}`
-    }
-  ]
-}
-];\n  // ...\n  return result;\n}",
+    starter:"function fizzbuzz(n) {\n  const result = [];\n  // ...\n  return result;\n}",
     fname:'fizzbuzz',
     tests:[
       {args:[5],exp:[1,2,'Fizz',4,'Buzz']},
@@ -1299,6 +1223,59 @@ ids.next().value → 2
     solution:"function* idGenerator() {\n  let id = 1;\n  while (true) {\n    yield id++;\n  }\n}"
   }]
 }
+
+,
+/* ---------- 12 ---------- */
+{
+  id:'m12', title:'DOM и события',
+  desc:'Работа с реальным UI: поиск элементов, изменение текста, классы и обработчики событий.',
+  links:[['DOM navigation','https://javascript.info/dom-nodes'],['Events','https://javascript.info/introduction-browser-events'],['Element methods','https://javascript.info/searching-elements-dom']],
+  theory:`<h3>// теория</h3>
+<p>DOM — это объектное представление HTML-страницы. Через DOM JavaScript находит элементы, меняет текст, классы и реагирует на действия пользователя.</p>
+<pre><code><span class="c-kw">const</span> btn = document.<span class="c-fn">querySelector</span>(<span class="c-str">'.btn'</span>);
+
+btn.<span class="c-fn">addEventListener</span>(<span class="c-str">'click'</span>, () =&gt; {
+  console.<span class="c-fn">log</span>(<span class="c-str">'clicked'</span>);
+});</code></pre>
+<ul>
+<li><code>document.querySelector(selector)</code> — найти первый элемент по CSS-селектору</li>
+<li><code>el.textContent</code> — прочитать или поменять текст</li>
+<li><code>el.classList.add/remove/toggle()</code> — управлять CSS-классами</li>
+<li><code>el.addEventListener('click', handler)</code> — подписаться на событие</li>
+</ul>`,
+  tasks:[
+  {
+    id:'m12t1', title:'changeText()', tag:'DOM',
+    desc:`Функция <code>changeText(selector, text)</code> находит элемент по селектору и меняет его текст на <code>text</code>.<span class="io">HTML: &lt;div id="status"&gt;old&lt;/div&gt;
+changeText('#status', 'ready')
+текст элемента → 'ready'</span>`,
+    starter:"function changeText(selector, text) {\n  // querySelector + textContent\n}",
+    fname:'changeText',
+    tests:[{custom:'domChangeText'}],
+    hint:'const el = document.querySelector(selector); затем el.textContent = text;',
+    solution:"function changeText(selector, text) {\n  const el = document.querySelector(selector);\n  el.textContent = text;\n}"
+  },
+  {
+    id:'m12t2', title:'toggleActive()', tag:'classList',
+    desc:`Функция <code>toggleActive(selector)</code> переключает класс <code>active</code> у найденного элемента.<span class="io">если active нет → добавить
+если active есть → убрать</span>`,
+    starter:"function toggleActive(selector) {\n  // classList.toggle\n}",
+    fname:'toggleActive',
+    tests:[{custom:'domToggle'}],
+    hint:'У элемента есть el.classList.toggle("active").',
+    solution:"function toggleActive(selector) {\n  const el = document.querySelector(selector);\n  el.classList.toggle('active');\n}"
+  },
+  {
+    id:'m12t3', title:'bindClick()', tag:'events',
+    desc:`Функция <code>bindClick(selector, cb)</code> находит элемент и навешивает на него обработчик клика <code>cb</code>.<span class="io">bindClick('#btn', () =&gt; calls++)
+click по кнопке → calls увеличился</span>`,
+    starter:"function bindClick(selector, cb) {\n  // addEventListener\n}",
+    fname:'bindClick',
+    tests:[{custom:'domClick'}],
+    hint:'el.addEventListener("click", cb).',
+    solution:"function bindClick(selector, cb) {\n  const el = document.querySelector(selector);\n  el.addEventListener('click', cb);\n}"
+  }]
+}
 ];
 
 /* =========================================================
@@ -1603,6 +1580,50 @@ const CUSTOM_TESTS = {
     const g2 = fn();
     if (g2.next().value !== 1) return {ok:false, msg:'новый генератор должен начинать заново с 1'};
     return {ok:true, msg:'бесконечный генератор id работает'};
+  }
+
+,
+  domChangeText: async (fn) => {
+    const el = document.createElement('div');
+    el.id = 'dom-test-status';
+    el.textContent = 'old';
+    document.body.appendChild(el);
+    try {
+      fn('#dom-test-status', 'ready');
+      if (el.textContent !== 'ready') return {ok:false, msg:`textContent = '${el.textContent}', ожидалось 'ready'`};
+      return {ok:true, msg:'текст элемента изменён'};
+    } finally {
+      el.remove();
+    }
+  },
+  domToggle: async (fn) => {
+    const el = document.createElement('div');
+    el.id = 'dom-test-toggle';
+    document.body.appendChild(el);
+    try {
+      fn('#dom-test-toggle');
+      if (!el.classList.contains('active')) return {ok:false, msg:'после первого вызова класс active должен появиться'};
+      fn('#dom-test-toggle');
+      if (el.classList.contains('active')) return {ok:false, msg:'после второго вызова класс active должен исчезнуть'};
+      return {ok:true, msg:'active корректно переключается'};
+    } finally {
+      el.remove();
+    }
+  },
+  domClick: async (fn) => {
+    const btn = document.createElement('button');
+    btn.id = 'dom-test-btn';
+    document.body.appendChild(btn);
+    let calls = 0;
+    try {
+      fn('#dom-test-btn', () => { calls++; });
+      btn.click();
+      btn.click();
+      if (calls !== 2) return {ok:false, msg:`обработчик вызван ${calls} раз(а), ожидалось 2`};
+      return {ok:true, msg:'click handler работает'};
+    } finally {
+      btn.remove();
+    }
   }
 };
 
